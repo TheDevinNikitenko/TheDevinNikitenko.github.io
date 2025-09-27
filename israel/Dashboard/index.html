@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camera Monitoring System</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="app.js" defer></script>
+</head>
+<body>
+    <div class="container">
+        <div class="world-clock">
+        <div class="time-block">
+            <div class="label">ZULU</div>
+            <div id="zulu-time" class="time">00:00:00Z</div>
+            <div class="timezone">UTC</div>
+        </div>
+        <div class="time-block">
+            <div class="label">ISRAEL</div>
+            <div id="israel-time" class="time">00:00:00</div>
+            <div class="timezone">IST (UTC+2/+3)</div>
+        </div>
+        <div class="time-block">
+            <div class="label">EASTERN</div>
+            <div id="est-time" class="time">00:00:00</div>
+            <div class="timezone">EST (UTC-5)</div>
+        </div>
+    </div>
+        
+        <div class="controls">
+            <button class="btn-primary" id="add-camera-btn">
+                <span class="material-icons">add</span> Add Camera
+            </button>
+        </div>
+        
+        <div class="camera-grid" id="camera-grid">
+            <!-- Example Camera Card (will be populated by JavaScript) -->
+            <div class="camera-card">
+                <div class="camera-header">
+                    <div>
+                        <span class="camera-title">Israel Skyline (Time New)</span>
+                        <span class="camera-live-badge">LIVE</span>
+                    </div>
+                    <div class="camera-actions">
+                        <button class="btn-icon" title="Edit">
+                            <span class="material-icons">edit</span>
+                        </button>
+                        <button class="btn-icon" title="Delete">
+                            <span class="material-icons">delete</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="camera-player">
+                    <div class="camera-offline">This live stream recording is not available.</div>
+                </div>
+                <div class="camera-info">
+                    <div class="camera-location">Tel Aviv, Israel</div>
+                    <div class="camera-source">YouTube</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="missileAlert">
+        <iframe src="https://www.tzevaadom.co.il/en/"></iframe>
+    </div>
+
+    <!-- Add/Edit Camera Modal -->
+    <div id="camera-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="modal-title">Add Camera</h2>
+            <form id="camera-form">
+                <input type="hidden" id="camera-id">
+                <div class="form-group">
+                    <label for="camera-title">Camera Title:</label>
+                    <input type="text" id="camera-title" placeholder="e.g., Israel Skyline" required>
+                </div>
+                <div class="form-group">
+                    <label for="camera-location">Location:</label>
+                    <input type="text" id="camera-location" placeholder="e.g., Tel Aviv, Israel" required>
+                </div>
+                <div class="form-group">
+                    <label for="camera-type">Stream Type:</label>
+                    <select id="camera-type" required>
+                        <option value="youtube">YouTube</option>
+                        <option value="hls">HLS (.m3u8)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="camera-url">Stream URL:</label>
+                    <input type="text" id="camera-url" placeholder="Enter stream URL" required>
+                    <small class="form-hint">For YouTube: https://www.youtube.com/embed/VIDEO_ID</small>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" id="cancel-btn">Cancel</button>
+                    <button type="submit" class="btn-primary">Save Camera</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
