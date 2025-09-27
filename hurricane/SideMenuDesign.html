@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Moment.js -->
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.30.1/moment.min.js"></script>
+    <!-- Leaflet (JS/CSS) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&family=Roboto:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
+    <!-- Styles.css -->
+    <link rel="stylesheet" href="styles.css"/>
+    <link rel="stylesheet" href="sideMenu.css">
+    <title>Weather Watcher v2</title>
+</head>
+<body>
+    <div id="sideMenu">
+        <button id="closeButton">X</button>
+        <h2>All Active Alerts</h2>
+        <div id="allAlertList">
+            <div id="alertWrapper">
+                <p>event name</p>
+                <p>sender name</p>
+                <div class="flex" id="alertMenuInfo">
+                    <p class="flex">max wind gust</p>
+                    <p class="flex">max hail size</p>
+                    <p class="flex">tornado detection</p>
+                </div>
+                <div class="flex" id="alertMenuBtns">
+                    <button>view description</button>
+                    <p>expires in 10 minutes</p>
+                    <button>show on map</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="menuButton">☰</div>
+    <script>
+        // Get NWS api for /alerts/active
+        async function fetchGeoJSONData() {
+            try {
+                const response = await fetch('https://api.weather.gov/alerts/active?limit=500');
+                const data = await response.json();
+                console.log(data);
+                return data.features;
+            } catch (error) {
+                console.error('Error fetching GeJSON data:', error);
+                return [];
+            }
+        }
+    </script>
+    <script type='text/javascript' src='js/sideMenuMovement.js'></script>
+    <script type='text/javascript' src="js/nwstest.js"></script>
+</body>
+</html>
+

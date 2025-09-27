@@ -1,0 +1,51 @@
+#information {
+    position: absolute;
+    left: 50px;
+    z-index: 9999;
+    height: 20px;
+}
+#map {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+}
+.leaflet-popup-content-wrapper {
+    border-radius: 0% !important;
+}
+#leaflet-popup-content {
+    width: 287px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+.leaflet-popup-content {
+    margin: 0% !important;
+}
+#popupTitle{
+    width: 100%;
+    background-color: maroon;
+    color: white;
+    text-align: center;
+}
+#tornadoPossibility{
+    padding: 0%;
+    margin: 0%;
+}
+#hailSize{
+    padding: 0%;
+    margin: 0%;
+}
+#windSpeed{
+    padding: 0%;
+    margin: 0%;
+}
+#expirationDate {
+    width: 100%;
+    background-color: #3d3d3d;
+    color: white;
+    text-align: center;
+}
+#lastUpdated {
+    color: white;
+}

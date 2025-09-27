@@ -1,0 +1,62 @@
+            var content = feature.properties.event + "<br>" + feature.properties.description;
+            var infoContent = document.getElementById('infoContent');
+            infoContent.innerHTML = content;
+            if (content.length > 500) {
+                infoContent.style.overflow = 'auto';
+            }
+            layer.bindPopup(content);
+
+        <div id="infoContent" class="leaflet-popup-content">
+            <p id="popupTitle">title</p>
+            <p id="tornadoPossibility">tornados??</p>
+            <p id="hailSize">Hail Size??</p>
+            <p id="windSpeed">Wind Speed??</p>
+            <p id="expirationDate">Expires when??</p>
+        </div>
+
+        '<p id="popupTitle">' + TITLEHERE + '</p>'
+
+        document.getElementById('popupTitle').innerHTML = title;
+            if (feature.properties.parameters.tornadoDetection) {
+               var tornadoPos = document.getElementById('tornadoPossibility').innerHTML = feature.properties.parameters.tornadoDetection[0];
+            };
+            if (feature.properties.parameters.maxHailSize) {
+                var hailSize = document.getElementById('hailSize').innerHTML = feature.properties.parameters.maxHailSize[0];
+            };
+            if (feature.properties.parameters.maxWindGust) {
+                var windGust = document.getElementById('windSpeed').innerHTML = feature.properties.parameters.maxWindGust[0];
+            };
+            if (feature.properties.parameters.eventEndingTime) {
+                var endingTime = document.getElementById('expirationDate').innerHTML = feature.properties.parameters.eventEndingTime[0];
+            };
+            layer.bindPopup(title);
+            layer.bindPopup(tornadoPos);
+            layer.bindPopup(hailSize);
+            layer.bindPopup(windGust);
+            layer.bindPopup(endingTime);
+
+            moment().to(feature.properties.parameters.eventEndingTime)
+
+
+            .properties.event
+            .properties.senderName
+            .properties.parameters.maxWindGust
+            .properties.parameters.maxHailSize
+            .properties.parameters.tornadoDetection
+            .properties.parameters.eventEndingTime
+            .properties.description  -- ?? maybe its long
+
+            <div id="alertWrapper">
+                <p>event name</p>
+                <p>sender name</p>
+                <div class="flex" id="alertMenuInfo">
+                    <p class="flex">max wind gust</p>
+                    <p class="flex">max hail size</p>
+                    <p class="flex">tornado detection</p>
+                </div>
+                <div class="flex" id="alertMenuBtns">
+                    <button>view description</button>
+                    <p>expires in 10 minutes</p>
+                    <button>show on map</button>
+                </div>
+            </div>

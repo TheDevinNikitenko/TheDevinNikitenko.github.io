@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Camera Display</title>
+    <link href="https://vjs.zencdn.net/7.15.4/video-js.css" rel="stylesheet">
+    <script src="https://vjs.zencdn.net/7.15.4/video.min.js"></script>
+    <style>
+        .camera-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+        .camera {
+            flex-basis: calc(33.33% - 20px); /* 3 cameras per row with 20px margin */
+            margin: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Camera Display</h1>
+    
+    <div class="camera-container">
+
+        <div class="camera">
+            <h2>Perry, Florida</h2>
+            <iframe id="cameraFrame1" width="640" height="360" frameborder="0" allowfullscreen="" src="https://video.nest.com/embedded/live/ag4voe1ej0?autoplay=1"></iframe>
+        </div>
+        <div class="camera">
+            <h2>Horseshoe Beach, Florida</h2>
+            <iframe id="cameraFrame2" width="640" height="360" frameborder="0" allowfullscreen="" src="https://video.nest.com/embedded/live/gE8ATWVXjH?autoplay=1"></iframe>
+        </div>
+        <div class="camera">
+            <h2>Crystal River, Florida</h2>
+            <iframe id="cameraFrame3" width="640" height="360" frameborder="0" allowfullscreen="" src="https://video.nest.com/embedded/live/4b19vWUB2E?autoplay=1"></iframe>
+        </div>
+        <div class="camera">
+            <h2>Cedar Key, Florida</h2>
+            <iframe id="cameraFrame4" width="640" height="360" frameborder="0" allowfullscreen="" src="https://video.nest.com/embedded/live/tKfe2W8qHf?autoplay=1"></iframe>
+        </div>
+        <div class="camera">
+            <h2>Cedar Key Canal, Florida</h2>
+            <iframe id="cameraFrame5" width="640" height="360" frameborder="0" allowfullscreen="" src="https://video.nest.com/embedded/live/6QvPRRleLo?autoplay=1"></iframe>
+        </div>
+        <div class="camera">
+            <h2>Cedar Key 2nd/B st, Florida</h2>
+            <iframe id="cameraFrame6" width="640" height="360" frameborder="0" allowfullscreen="" src="https://video.nest.com/embedded/live/ZfmhaR6uKU?autoplay=1"></iframe>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Initialize Video.js players for cameras 2 to 5
+            for (let i = 2; i <= 5; i++) {
+                videojs("cameraVideo" + i);
+                loadVideoUrl(i); // Load initial URLs for each player
+            }
+    
+            // Load iframe URL for camera 1
+            loadIframeUrl();
+        });
+    
+        function loadUrls() {
+            // Load URL for camera 1
+            loadIframeUrl();
+            
+            // Load URLs for cameras 2 to 5
+            for (let i = 2; i <= 5; i++) {
+                loadVideoUrl(i);
+            }
+        }
+    
+        function loadIframeUrl() {
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "get_url.php?camera=1", true); // Link to the get_url.php script
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+                    var iframe = document.getElementById("cameraFrame1");
+                    iframe.src = xhr.responseText; // Set iframe URL
+                }
+            };
+            xhr.send();
+        }
+    
+        function loadVideoUrl(cameraNumber) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "get_url.php?camera=" + cameraNumber, true); // Link to the get_url.php script
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+                    var newUrl = xhr.responseText;
+                    updateVideoUrl(cameraNumber, newUrl); // Update Video.js player URL
+                }
+            };
+            xhr.send();
+        }
+    
+        function updateVideoUrl(cameraNumber, newUrl) {
+            var videoPlayer = videojs("cameraVideo" + cameraNumber);
+            videoPlayer.src({
+                type: "application/x-mpegURL",
+                src: newUrl
+            });
+            videoPlayer.play();
+        }
+    </script>
+    
+</body>
+</html>

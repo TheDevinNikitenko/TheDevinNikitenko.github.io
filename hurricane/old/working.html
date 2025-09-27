@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        html, body, #map { height: 100%; width: 100%; padding: 0; margin: 0; }
+       
+        #sideMenu {
+            position: fixed; /* Change this to "fixed" */
+            top: 0;
+            right: -300px;
+            width: 300px;
+            height: 100%;
+            background-color: #f8f8f8;
+            transition: right 0.3s ease-in-out;
+            z-index: 1000;
+            overflow-y: auto;
+        } 
+        #map {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+        }
+        #menuButton {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 1000;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        #sideMenu {
+            position: absolute;
+            top: 0;
+            right: -300px;
+            width: 300px;
+            height: 100%;
+            background-color: #f8f8f8;
+            transition: right 0.3s ease-in-out;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        #infoBox {
+            width: 300px;
+            height: 200px;
+            overflow: hidden;
+            background-color: white;
+            position: absolute;
+            top: 50px;
+            left: 50px;
+        }
+
+        #infoContent {
+            height: 100%;
+            overflow: auto;
+            /* If you want to match the width set in the leaflet-popup-content style */
+            width: 501px;
+        }
+   
+        #leaflet-popup-content {
+            width: 287px;
+            overflow: auto;
+            height: 200px;
+        }
+    </style>
+    <!-- Leaflet (JS/CSS) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css">
+    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
+    <!-- Leaflet-KMZ -->
+    <script src="https://unpkg.com/leaflet-kmz@latest/dist/leaflet-kmz.js"></script>
+    <title>Weather Watchers | Map</title>
+</head>
+<body>
+    <div id="map"></div>
+    <div id="sideMenu">
+        <button id="closeButton">X</button>
+        <h2>Weather Watchers</h2>
+        <p>Map controls.</p>
+        <button class="btn-hover color-1" id="toggleWeatherButton">Toggle Weather Tile</button>
+        <button class="btn-hover color-3" id="toggleGeoJSONButton">Toggle Alert Tile</button>
+    </div>
+    <div id="menuButton">☰</div>
+    <div id="infoBox">
+        <div id="infoContent" class="leaflet-popup-content"></div>
+    </div>
+    <script>
+        let map;
+        let weatherTileLayer;
+        let geoJSONLayer;
+
+        async function fetchGeoJSONData() {
+            try {
+                const response = await fetch('https://api.weather.gov/alerts/active?limit=500');
+                const data = await response.json();
+                return data.features;
+            } catch (error) {
+                console.error('Error fetching GeoJSON data:', error);
+                return [];
+            }
+        }
+
+        async function initializeMap() {
+            map = L.map('map').setView([27.214611848336645, -82.18274600998247], 6);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+
+            const geoJSONData = await fetchGeoJSONData();
+
+            geoJSONLayer = L.geoJSON(geoJSONData, {
+                style: {
+                    fillColor: 'rgba(255, 0, 0, 0.6);',
+                    color: 'red',
+                    weight: 2
+                },
+                onEachFeature: function (feature, layer) {
+                    var content = feature.properties.event + '<br>' + feature.properties.description;
+                    var infoContent = document.getElementById('infoContent');  // Define infoContent here
+                    infoContent.innerHTML = content;
+
+                    if (content.length > 500) {
+                        infoContent.style.overflow = 'auto';
+                    }
+
+                    layer.bindPopup(content);
+                }
+            }).addTo(map);
+
+            weatherTileLayer = L.tileLayer('https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/nexrad-n0q-900913/{z}/{x}/{y}.png', {
+                attribution: '© Iowa Environmental Mesonet'
+            });
+
+            const closeButton = document.getElementById('closeButton');
+            closeButton.addEventListener('click', closeSideMenu);
+
+            const menuButton = document.getElementById('menuButton');
+            menuButton.addEventListener('click', toggleSideMenu);
+
+            const toggleWeatherButton = document.getElementById('toggleWeatherButton');
+            toggleWeatherButton.addEventListener('click', toggleWeatherTile);
+
+            const toggleGeoJSONButton = document.getElementById('toggleGeoJSONButton');
+            toggleGeoJSONButton.addEventListener('click', toggleGeoJSONLayer);
+
+            // LOAD THE KMZ FILE
+            var kmz = L.kmzLayer().addTo(map);
+
+            kmz.on('load', function(e) {
+                var layer = e.layer;
+                control.addOverlay(layer, e.name);
+
+                if (e.name === 'AL102023_CONE_latest.kmz') {
+                    layer.setStyle({
+                        fillOpacity: 0.3,
+                        color: 'black',
+                        weight: 3
+                    });
+                } else if (e.name === 'AL102023_TRACK_latest.kmz') {
+                    layer.setStyle({
+                        fillOpacity: 0,
+                        color: 'black',
+                        weight: 3,
+                    });
+                } else if (e.name === 'AL082023_CONE_latest.kmz') {
+                    layer.setStyle({
+                        fillOpacity: 0.3,
+                        color: 'black',
+                        weight: 3
+                    });
+                } else if (e.name === 'AL082023_TRACK_latest.kmz') {
+                    layer.setStyle({
+                        fillOpacity: 0,
+                        color: 'black',
+                        weight: 3,
+                    });
+                } else {
+                    layer.setStyle({
+                        fillOpacity: 0,
+                        weight: 6
+                    });
+                }
+            });
+
+            //Idalia
+            kmz.load('https://corsproxy.io/?https://www.nhc.noaa.gov/storm_graphics/api/AL102023_CONE_latest.kmz');
+            kmz.load('https://corsproxy.io/?https://www.nhc.noaa.gov/storm_graphics/api/AL102023_TRACK_latest.kmz');
+            kmz.load('https://corsproxy.io/?https://www.nhc.noaa.gov/storm_graphics/api/AL102023_WW_latest.kmz');
+            //Franklin
+            kmz.load('https://corsproxy.io/?https://www.nhc.noaa.gov/storm_graphics/api/AL082023_CONE_latest.kmz');
+            kmz.load('https://corsproxy.io/?https://www.nhc.noaa.gov/storm_graphics/api/AL082023_TRACK_latest.kmz');
+            kmz.load('https://corsproxy.io/?https://www.nhc.noaa.gov/storm_graphics/api/AL082023_WW_latest.kmz');
+
+            var control = L.control.layers(null, null, { collapsed:false }).addTo(map);
+        }
+
+        function toggleWeatherTile() {
+            if (map.hasLayer(weatherTileLayer)) {
+                map.removeLayer(weatherTileLayer);
+            } else {
+                weatherTileLayer.addTo(map);
+            }
+        }
+
+        function toggleGeoJSONLayer() {
+            if (map.hasLayer(geoJSONLayer)) {
+                map.removeLayer(geoJSONLayer);
+            } else {
+                geoJSONLayer.addTo(map);
+            }
+        }
+
+        function toggleSideMenu() {
+            const sideMenu = document.getElementById('sideMenu');
+            sideMenu.style.right = sideMenu.style.right === '0px' ? '-300px' : '0px';
+        }
+
+        function closeSideMenu() {
+            const sideMenu = document.getElementById('sideMenu');
+            sideMenu.style.right = '-300px';
+        }
+
+        initializeMap();
+    </script>
+<style>
+    .buttons {
+    margin: 10%;
+    text-align: center;
+}
+
+.btn-hover {
+    width: 200px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+    margin: 20px;
+    height: 55px;
+    text-align:center;
+    border: none;
+    background-size: 300% 100%;
+
+    border-radius: 50px;
+    moz-transition: all .4s ease-in-out;
+    -o-transition: all .4s ease-in-out;
+    -webkit-transition: all .4s ease-in-out;
+    transition: all .4s ease-in-out;
+}
+
+.btn-hover:hover {
+    background-position: 100% 0;
+    moz-transition: all .4s ease-in-out;
+    -o-transition: all .4s ease-in-out;
+    -webkit-transition: all .4s ease-in-out;
+    transition: all .4s ease-in-out;
+}
+
+.btn-hover:focus {
+    outline: none;
+}
+
+.btn-hover.color-1 {
+    background-image: linear-gradient(to right, #25aae1, #40e495, #30dd8a, #2bb673);
+    box-shadow: 0 4px 15px 0 rgba(49, 196, 190, 0.75);
+}
+
+.btn-hover.color-3 {
+    background-image: linear-gradient(to right, #667eea, #764ba2, #6B8DD6, #8E37D7);
+    box-shadow: 0 4px 15px 0 rgba(116, 79, 168, 0.75);
+}
+</style>
+</body>
+
+</html>

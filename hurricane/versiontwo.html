@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Moment.js -->
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.30.1/moment.min.js"></script>
+    <!-- Leaflet (JS/CSS) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&family=Roboto:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
+    <!-- Styles.css -->
+    <link rel="stylesheet" href="styles.css"/>
+    <!-- Leaflet-KMZ -->
+    <script src="https://unpkg.com/leaflet-kmz@latest/dist/leaflet-kmz.js"></script>
+    <title>Weather Watcher v2</title>
+    
+</head>
+<body>
+    <div id="information">
+        <p id="lastUpdated">Last Updated: 00:00</p>
+    </div>
+    <!-- Map Div -->
+    <div id="map"></div>
+    <!-- All Alerts Side Menu -->
+    <div id="sideMenu">
+        <button id="closeButton">X</button>
+        <h2>All Active Alerts</h2>
+        <div>
+            <p>some data</p>
+            <p>some data</p>
+        </div>
+        <div>
+            <p>some data</p>
+            <p>some data</p>
+        </div>
+    </div>
+    <div id="menuButton">☰</div>
+    <!-- Alert Info Box -->
+    <div id="infoBox">
+        <div id="infoContent" class="leaflet-popup-content">
+            <p id="popupTitle">title</p>
+            <p id="tornadoPossibility">tornados??</p>
+            <p id="hailSize">Hail Size??</p>
+            <p id="windSpeed">Wind Speed??</p>
+            <p id="expirationDate">Expires when??</p>
+            <button>Description</button>
+        </div>
+    </div>
+    <!-- map.js setting up and populating the map div-->
+    <script type='text/javascript' src='js/moment.js'></script>
+    <script type='text/javascript' src='js/map.js'></script>
+    <!-- <script type='text/javascript' src="js/nwsradarstations.js"></script> Disabled on 07/09/2024 - iastate.edu gives raster images w/ horrible detail -->
+    <script type='text/javascript' src='js/NWSAlerts.js'></script>
+    <script type='text/javascript' src='js/weathertile.js'></script>
+    <script type='text/javascript' src='js/sideMenuMovement.js'></script>
+    <!-- <script type='text/javascript' src='js/kmzLoader.js'></script> Disabled due to it pissing me off with api.weather.gov CORS errors -->
+    <!-- <script type='text/javascript' src='js/countryBorders.js'></script> Not needed atm because weather tile is not giving GOES sat image atm -->
+    <script type='text/javascript' src='js/radarfromjson.js'></script>
+</body>
+</html>
+

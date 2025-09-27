@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        html, body, #map { height: 100%; width: 100%; padding: 0; margin: 0; }
+       
+        #sideMenu {
+            position: fixed; /* Change this to "fixed" */
+            top: 0;
+            right: -300px;
+            width: 300px;
+            height: 100%;
+            background: hsl(227, 10%, 10%);
+            transition: right 0.3s ease-in-out;
+            z-index: 1000;
+            overflow-y: auto;
+        } 
+        #map {
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+        }
+        #menuButton {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 1000;
+            background-color: #fff;
+            border: 1px solid #ccc;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        #sideMenu {
+            position: absolute;
+            top: 0;
+            right: -300px;
+            width: 300px;
+            height: 100%;
+            background-color: #f8f8f8;
+            transition: right 0.3s ease-in-out;
+            z-index: 1000;
+            overflow-y: auto;
+            font-family: 'Roboto', sans-serif;
+            text-align: center;
+        }
+
+        #infoBox {
+            width: 300px;
+            height: 200px;
+            overflow: hidden;
+            background-color: white;
+            position: absolute;
+            top: 50px;
+            left: 50px;
+        }
+
+        #infoContent {
+            height: 100%;
+            overflow: auto;
+            /* If you want to match the width set in the leaflet-popup-content style */
+            width: 501px;
+        }
+   
+        #leaflet-popup-content {
+            width: 287px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+    <!-- Leaflet (JS/CSS) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css">
+    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"></script>
+    <!-- Leaflet-SHP -->
+    <script src="https://unpkg.com/shpjs@latest/dist/shp.js"></script>
+    <script src="https://unpkg.com/shpjs@3.4.1/dist/shp.js"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&family=Roboto:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
+
+    
+    <title>Weather Watchers | Map</title>
+</head>
+<body>
+    <div id="map"></div>
+    <div id="sideMenu">
+        <button id="closeButton">X</button>
+        <h2>Weather Watchers</h2>
+        <p>Map controls.</p>
+        <button class="close" id="toggleWeatherButton">Toggle Weather Layer</button>
+        <button class="close" id="toggleCloudButton">Toggle Cloud Layer</button>
+        <button class="close" id="togglePrecipitationButton">Toggle Precipitation Layer</button>
+        <button class="close" id="toggleGeoJSONAlertButton">Toggle Alerts</button>
+        <button class="close" id="toggleGeoJSONButton">Toggle Hurricane Track</button>
+        <button class="close" id="togglePastTrack">Toggle Hurricane Past Track</button>
+        <button class="close" id="toggleOutlook">Toggle Tropical Outlook</button>
+    </div>
+    <div id="menuButton">☰</div>
+    <div id="infoBox">
+        <div id="infoContent" class="leaflet-popup-content"></div>
+    </div>
+    <script>
+        let map;
+        let weatherTileLayer;
+        let geoJSONLayer;
+        let pastTrackLayer;
+
+        async function fetchGeoJSONData() {
+            try {
+                const response = await fetch('https://api.weather.gov/alerts/active?limit=500');
+                const data = await response.json();
+                return data.features;
+            } catch (error) {
+                console.error('Error fetching GeoJSON data:', error);
+                return [];
+            }
+        }
+
+        async function loadSHPData() {
+            try {
+                const response = await fetch('https://corsproxy.io/?https://www.nhc.noaa.gov/gis/forecast/archive/al132023_5day_latest.zip'); // Replace with your SHP file link
+                const arrayBuffer = await response.arrayBuffer();
+                const shapeData = await shp(arrayBuffer);
+        
+                // Assuming you have a Leaflet map set up (initialized in initializeMap function)
+                geoJSONLayer = L.geoJSON(shapeData, {
+                    style: {
+                        fillColor: 'rgba(255, 0, 0, 0.6);',
+                        color: 'red',
+                        weight: 2
+                    },
+                    pointToLayer: function (feature, latlng) {
+                        // Determine icon based on GUST value
+                        var gust = feature.properties.GUST;
+        
+                        var iconUrl;
+                        if (!isNaN(gust) && gust >= 0 && gust <= 73) {
+                            iconUrl = 'icons/TS.png';
+                        } else if (!isNaN(gust) && gust >= 74 && gust <= 95) {
+                            iconUrl = 'icons/CAT1.png';
+                        } else if (!isNaN(gust) && gust >= 96 && gust <= 110) {
+                            iconUrl = 'icons/CAT2.png';
+                        } else if (!isNaN(gust) && gust >= 111 && gust <= 129) {
+                            iconUrl = 'icons/CAT3.png';
+                        } else if (!isNaN(gust) && gust >= 130 && gust <= 156) {
+                            iconUrl = 'icons/CAT4.png';
+                        } else if (!isNaN(gust) && gust >= 157 && gust <= 300) {
+                            iconUrl = 'icons/CAT5.png';
+                        }
+        
+                        var icon = L.icon({
+                            iconUrl: iconUrl,
+                            iconSize: [32, 32],
+                            iconAnchor: [16, 16],
+                            popupAnchor: [0, -16]
+                        });
+        
+                        return L.marker(latlng, { icon: icon });
+                    },
+                    onEachFeature: function (feature, layer) {
+                        var content;
+        
+                        // Check if it's the special part with unique properties
+                        //console.log(feature.properties);
+                        if (feature.properties.GUST !== undefined) {
+                            content = '<B>' + feature.properties.STORMNAME + '</B> <br>' + feature.properties.DATELBL + '<br>' + '<B>Wind Gust:</B> ' + feature.properties.GUST;
+                        } else {
+                            // For regular features
+                            var content = '<B>' + feature.properties.STORMTYPE + ' ' + feature.properties.STORMNAME + '</B> <br>' + feature.properties.ADVDATE;
+                        }
+        
+                        var infoContent = document.getElementById('infoContent');
+                        infoContent.innerHTML = content;
+        
+                        if (content.length > 500) {
+                            infoContent.style.overflow = 'auto';
+                        }
+        
+                        layer.bindPopup(content);
+                    }
+                }).addTo(map);
+            } catch (error) {
+                console.error('Error loading SHP data:', error);
+            }
+        }
+
+        async function loadSHPData2() {
+            try {
+                const response = await fetch('https://corsproxy.io/?https://www.nhc.noaa.gov/gis/best_track/al132023_best_track.zip'); // Replace with your SHP file link
+                const arrayBuffer = await response.arrayBuffer();
+                const shapeData = await shp(arrayBuffer);
+        
+                // Assuming you have a Leaflet map set up (initialized in initializeMap function)
+                pastTrackLayer = L.geoJSON(shapeData, {
+                    style: {
+                        fillColor: 'rgba(255, 0, 0, 0.6);',
+                        color: 'red',
+                        weight: 2
+                    },
+                    onEachFeature: function (feature, layer) {
+                        var content;
+        
+                        // Check if it's the special part with unique properties
+                        //console.log(feature.properties);
+                        if (feature.properties.GUST !== undefined) {
+                            content = feature.properties.STORMNAME + '<br>' + feature.properties.DATELBL + '<br>' + 'Wind Gust: ' + feature.properties.GUST;
+                        } else {
+                            // For regular features
+                            var content = feature.properties.STORMTYPE + ' ' + feature.properties.STORMNAME + '<br>' + feature.properties.ADVDATE;
+                        }
+        
+                        var infoContent = document.getElementById('infoContent');
+                        infoContent.innerHTML = content;
+        
+                        if (content.length > 500) {
+                            infoContent.style.overflow = 'auto';
+                        }
+        
+                        layer.bindPopup(content);
+                    }
+                }).addTo(map);
+            } catch (error) {
+                console.error('Error loading SHP data:', error);
+            }
+        }
+
+        async function loadSHPData3() {
+            try {
+                const response = await fetch('https://corsproxy.io/?https://www.nhc.noaa.gov/xgtwo/gtwo_shapefiles.zip'); // Replace with your SHP file link
+                const arrayBuffer = await response.arrayBuffer();
+                const shapeData = await shp(arrayBuffer);
+        
+                // Assuming you have a Leaflet map set up (initialized in initializeMap function)
+                outlookLayer = L.geoJSON(shapeData, {
+                    style: function(feature) {
+                        var risk = feature.properties.RISK2DAY;
+                
+                        var styleOptions = {
+                            weight: 2
+                        };
+                
+                        if (risk == 'Low') {
+                            styleOptions.fillColor = 'rgba(244, 228, 22, 0.6)';
+                            styleOptions.color = 'yellow';
+                        } else if (risk == 'Medium') {
+                            styleOptions.fillColor = 'rgba(244, 135, 22, 0.6)';
+                            styleOptions.color = 'orange';
+                        } else if (risk == 'High') {
+                            styleOptions.fillColor = 'rgba(244, 43, 22, 0.6)';
+                            styleOptions.color = 'red';
+                        }
+                
+                        return styleOptions;
+                    },
+                    pointToLayer: function (feature, latlng) {
+                        // Determine icon based on GUST value
+                        var risk = feature.properties.RISK2DAY;
+        
+                        var iconUrl;
+                        if (risk == 'Low') {
+                            iconUrl = 'icons/AOI1.png';
+                        } else if (risk == 'Medium') {
+                            iconUrl = 'icons/AOI2.png';
+                        } else if (risk == 'High') {
+                            iconUrl = 'icons/AOI3.png';
+                        }
+        
+                        var icon = L.icon({
+                            iconUrl: iconUrl,
+                            iconSize: [32, 32],
+                            iconAnchor: [16, 16],
+                            popupAnchor: [0, -16]
+                        });
+        
+                        return L.marker(latlng, { icon: icon });
+                    },
+                    onEachFeature: function (feature, layer) {
+                        var content;
+                        console.log(feature.properties);
+                        
+                        var content = '<B> Area: ' + feature.properties.AREA + '</B> <br>' + '<B>2 Days:</B> ' + feature.properties.PROB2DAY + '<br>' + '<B>2 Day Risk:</B> ' + feature.properties.RISK2DAY + '<br>' + '<B>7 Days:</B> ' + feature.properties.PROB7DAY + '<br>' + '<B>7 Day Risk:</B> ' + feature.properties.RISK7DAY
+
+                        var infoContent = document.getElementById('infoContent');
+                        infoContent.innerHTML = content;
+
+                        layer.bindPopup(content);
+                    }
+                }).addTo(map);
+            } catch (error) {
+                console.error('Error loading SHP data:', error);
+            }
+        }
+
+        // Define a function to reload the data
+        function reloadSHPData() {
+            loadSHPData();
+        }
+
+        async function initializeMap() {
+            map = L.map('map').setView([21.893829379513928, -65.31409921717274], 5);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+
+            const geoJSONData = await fetchGeoJSONData();
+
+            geoJSONLayerAlert = L.geoJSON(geoJSONData, {
+                style: function (feature) {
+                    var event = feature.properties.event;
+            
+                    // Define different styles based on event
+                    var styles = {
+                        'Special Weather Statement': {
+                            fillColor: 'rgba(255, 196, 131, 0.8)',
+                            color: 'rgba(255, 196, 131, 0.8)',
+                            weight: 2
+                        },
+                        'Severe Thunderstorm Warning': {
+                            fillColor: 'rgba(255, 93, 0, 0.8)',
+                            color: 'rgba(255, 93, 0, 0.8)',
+                            weight: 2
+                        },
+                        'Tornado Warning': {
+                            fillColor: 'rgba(255, 0, 0, 0.8)',
+                            color: 'rgba(255, 0, 0, 0.8)',
+                            weight: 2
+                        },
+                        'Flood Watch': {
+                            fillColor: 'rgba(143, 196, 131, 0.8)',
+                            color: 'rgba(143, 196, 131, 0.8)',
+                            weight: 2
+                        },
+                        'Flood Warning': {
+                            fillColor: 'rgba(143, 196, 131, 0.8)',
+                            color: 'rgba(68, 125, 55, 0.8)',
+                            weight: 2
+                        },
+                        'Flood Advisory': {
+                            fillColor: 'rgba(143, 255, 131, 0.8)',
+                            color: 'rgba(143, 255, 131, 0.8)',
+                            weight: 2
+                        },
+                        'Flash Flood Warning': {
+                            fillColor: 'rgba(38, 237, 78, 0.8)',
+                            color: 'rgba(38, 237, 78, 0.8)',
+                            weight: 2
+                        },
+                        'Special Marine Warning': {
+                            fillColor: 'rgba(0, 0, 231, 0.8)',
+                            color: 'rgba(0, 0, 231, 0.8)',
+                            weight: 2
+                        },
+                        'Marine Weather Statement': {
+                            fillColor: 'rgba(53, 53, 252, 0.8)',
+                            color: 'rgba(53, 53, 252, 0.8)',
+                            weight: 2
+                        },
+                        'Storm Surge Watch': {
+                            fillColor: 'rgba(99, 214, 122, 0.8)',
+                            color: 'rgba(99, 214, 122, 0.8)',
+                            weight: 2
+                        },
+                        'Tropical Storm Watch': {
+                            fillColor: 'rgba(235, 216, 52, 0.8)',
+                            color: 'rgba(235, 216, 52, 0.8)',
+                            weight: 2
+                        },
+                        'Tropical Storm Warning': {
+                            fillColor: 'rgba(38, 111, 237, 0.8)',
+                            color: 'rgba(38, 111, 237, 0.8)',
+                            weight: 2
+                        },
+                        'Hurricane Watch': {
+                            fillColor: 'rgba(227, 141, 141, 0.8)',
+                            color: 'rgba(227, 141, 141, 0.8)',
+                            weight: 2
+                        },
+                        'Hurricane Warning': {
+                            fillColor: 'rgba(237, 38, 38, 0.8)',
+                            color: 'rgba(237, 38, 38, 0.8)',
+                            weight: 2
+                        },
+                        // Add more events and their corresponding styles as needed
+                    };
+                    // Default style for unlisted events
+                    var defaultStyle = {
+                        fillColor: 'rgba(128, 128, 128, 0.6)', // Gray color
+                        color: 'black', // Black border color
+                        weight: 2
+                    };
+
+                    return styles[event] || defaultStyle;
+                },
+                onEachFeature: function (feature, layer) {
+                    var content = feature.properties.event + '<br>' + feature.properties.description;
+                    var infoContent = document.getElementById('infoContent');
+                    infoContent.innerHTML = content;
+            
+                    if (content.length > 500) {
+                        infoContent.style.overflow = 'auto';
+                    }
+            
+                    layer.bindPopup(content);
+                }
+            }).addTo(map);
+
+            weatherTileLayer = L.tileLayer('https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/nexrad-n0q-900913/{z}/{x}/{y}.png', {
+                attribution: '© Iowa Environmental Mesonet'
+            });
+
+            cloudTileLayer = L.tileLayer('https://tile.openweathermap.org/map/{layer}/{z}/{x}/{y}.png?appid={apiKey}', {
+                layer: 'clouds',
+                apiKey: 'eefccd185a9919da105471151100488e', // Replace with your OpenWeatherMap API key
+                attribution: '© OpenWeatherMap'
+            });
+
+            precipTileLayer = L.tileLayer('https://tile.openweathermap.org/map/{layer}/{z}/{x}/{y}.png?appid={apiKey}', {
+                layer: 'precipitation',
+                apiKey: 'eefccd185a9919da105471151100488e',
+                attribution: '© OpenWeatherMap',
+                tileSize: 512, // Set the tile size to 512 pixels
+                zoomOffset: -1, // Adjust the zoom offset if needed
+                style: `
+                    raster-opacity: 0.6;
+                    raster-scaling: lanczos;
+                    raster-colorizer-default-mode: linear;
+                    raster-colorizer-default-color: transparent;
+                    raster-colorizer-stops:
+                        stop(0, rgba(225, 200, 100, 0))
+                        stop(0.1, rgba(200, 150, 150, 0))
+                        stop(0.2, rgba(150, 150, 170, 0))
+                        stop(0.5, rgba(120, 120, 190, 0))
+                        stop(1, rgba(110, 110, 205, 0.3))
+                        stop(10, rgba(80,80, 225, 0.7))
+                        stop(140, rgba(20, 20, 255, 0.9));
+                `
+            });
+            
+
+            const closeButton = document.getElementById('closeButton');
+            closeButton.addEventListener('click', closeSideMenu);
+
+            const menuButton = document.getElementById('menuButton');
+            menuButton.addEventListener('click', toggleSideMenu);
+            
+            const toggleWeatherButton = document.getElementById('toggleWeatherButton');
+            toggleWeatherButton.addEventListener('click', toggleWeatherTile);
+
+            const toggleCloudButton = document.getElementById('toggleCloudButton');
+            toggleCloudButton.addEventListener('click', toggleCloudTile);
+
+            const togglePrecipitationButton = document.getElementById('togglePrecipitationButton');
+            togglePrecipitationButton.addEventListener('click', togglePrecipitationTile);
+
+            const toggleGeoJSONButton = document.getElementById('toggleGeoJSONButton');
+            toggleGeoJSONButton.addEventListener('click', toggleGeoJSONLayer);
+
+            const toggleGeoJSONAlertButton = document.getElementById('toggleGeoJSONAlertButton');
+            toggleGeoJSONAlertButton.addEventListener('click', toggleGeoJSONAlertLayer);
+
+            const togglePastTrackButton = document.getElementById('togglePastTrack');
+            togglePastTrackButton.addEventListener('click', togglePastTrackLayer);
+
+            const toggleOutlookButton = document.getElementById('toggleOutlook');
+            toggleOutlookButton.addEventListener('click', toggleOutlookLayer);
+
+            await loadSHPData(); // Hurricane Track
+            await loadSHPData2(); //Past Track
+            map.removeLayer(pastTrackLayer);
+            await loadSHPData3(); //Tropical Outlook
+        }
+        
+
+        function toggleWeatherTile() {
+            if (map.hasLayer(weatherTileLayer)) {
+                map.removeLayer(weatherTileLayer);
+            } else {
+                weatherTileLayer.addTo(map);
+            }
+        }
+
+        function toggleCloudTile() {
+            if (map.hasLayer(cloudTileLayer)) {
+                map.removeLayer(cloudTileLayer);
+            } else {
+                cloudTileLayer.addTo(map);
+            }
+        }
+
+        function togglePrecipitationTile() {
+            if (map.hasLayer(precipTileLayer)) {
+                map.removeLayer(precipTileLayer);
+            } else {
+                precipTileLayer.addTo(map);
+            }
+        }
+
+        function toggleGeoJSONLayer() {
+            if (map.hasLayer(geoJSONLayer)) {
+                map.removeLayer(geoJSONLayer);
+            } else {
+                geoJSONLayer.addTo(map);
+            }
+        }
+
+        function toggleGeoJSONAlertLayer() {
+            if (map.hasLayer(geoJSONLayerAlert)) {
+                map.removeLayer(geoJSONLayerAlert);
+            } else {
+                geoJSONLayerAlert.addTo(map);
+            }
+        }
+
+        function togglePastTrackLayer() {
+            if (map.hasLayer(pastTrackLayer)) {
+                map.removeLayer(pastTrackLayer);
+            } else {
+                pastTrackLayer.addTo(map);
+            }
+        }
+
+        function toggleOutlookLayer() {
+            if (map.hasLayer(outlookLayer)) {
+                map.removeLayer(outlookLayer);
+            } else {
+                outlookLayer.addTo(map);
+            }
+        }
+
+        function toggleSideMenu() {
+            const sideMenu = document.getElementById('sideMenu');
+            sideMenu.style.right = sideMenu.style.right === '0px' ? '-300px' : '0px';
+        }
+
+        function closeSideMenu() {
+            const sideMenu = document.getElementById('sideMenu');
+            sideMenu.style.right = '-300px';
+        }
+
+        initializeMap();
+    </script>
+<style>
+    .buttons {
+        background: none;
+        border: 2px solid;
+        font: inherit;
+        line-height: 1;
+        margin: 0.5em;
+        padding: 1em 2em;
+    }
+
+    .close:hover {
+        box-shadow: 
+            inset -3.5em 0 0 0 var(--hover),
+            inset 3.5em 0 0 0 var(--hover);  
+        color: #8E37D7;
+    }
+
+    button {  
+        color: var(--color);
+        transition: 0.25s;
+        
+        &:hover,
+        &:focus { 
+          border-color: var(--hover);
+          color: #fff;
+        }
+      }
+    button {
+        background: none;
+        border: 2px solid;
+        font: inherit;
+        line-height: 1;
+        margin: 0.5em;
+        padding: 1em 2em;
+        color: #19bc8b;
+        border-color: #19bc8b;
+        box-shadow: 0 4px 15px 0 rgba(49, 196, 190, 0.75);
+      }
+
+    .btn-hover.color-1 {
+        background-image: linear-gradient(to right, #25aae1, #40e495, #30dd8a, #2bb673);
+        box-shadow: 0 4px 15px 0 rgba(49, 196, 190, 0.75);
+    }
+
+    .btn-hover.color-3 {
+        background-image: linear-gradient(to right, #667eea, #764ba2, #6B8DD6, #8E37D7);
+        box-shadow: 0 4px 15px 0 rgba(116, 79, 168, 0.75);
+    }
+</style>
+</body>
+</html>

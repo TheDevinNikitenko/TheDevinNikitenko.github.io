@@ -1,0 +1,599 @@
+body{
+    margin: 0px;
+    padding: 0px;
+    background-color: #181818;
+}
+.hurricaneInfo {
+    background-color: aqua;
+    width: 30%;
+    height: 100%;
+    float: right;
+    margin: 0px;
+    padding: 0px;
+    position: relative;
+    justify-content: start;
+}
+
+.hcName {
+    position: relative;
+    display: flex; /* Flexbox to align items horizontally */
+    align-items: center; /* Vertically align icon and text */
+    color: white;
+    background-image: url(hcBg.jpg);
+    background-position: center;
+}
+
+.iconContainer {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    margin-left: 20px;
+}
+
+.hurricaneIcon {
+    width: 75px;
+    height: 75px;
+    margin: 10px;
+    color: white;
+}
+
+.hurricaneStrengthIcon {
+    position: absolute;
+    top: 15px;
+    left: 0px;
+    right: 0;
+    text-align: center;
+    font-family: "Roboto", sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+    color: red;
+    pointer-events: none;
+}
+
+.hurricaneTextContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-left: 100px; /* Space between the icon and the text */
+}
+
+.hurricaneName, .hurricaneCategory {
+    margin: 0;
+    padding: 0;
+    font-family: "Roboto", sans-serif;
+}
+
+.hurricaneName {
+    font-size: 30px;
+    font-weight: 400;
+}
+
+.hurricaneCategory {
+    font-size: 45px;
+    font-weight: 700;
+    font-style: italic;
+}
+
+/* Spinning animation */
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(-360deg);
+    }
+}
+
+.spin-animation {
+    animation: spin 2s linear infinite;
+}
+.latestAdvisory {
+    background-color: #181818;
+    font-family: "Roboto", sans-serif;
+}
+.latestAdvisText{
+    margin: 0;
+    padding: 10px;
+    text-align: center;
+    font-size: 20px;
+    font-weight: 200;
+    color: white;
+}
+.hcWindStrength{
+    position: relative;
+    display: flex; /* Flexbox to align items horizontally */
+    align-items: center; /* Vertically align icon and text */
+    justify-content: center;
+    color: white;
+    background-color: #181818;
+    padding: 10px;
+    font-family: "Roboto", sans-serif;
+    margin: 0 auto;
+}
+.windContainer {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    margin-left: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.windData {
+    display: flex;
+    align-items: baseline; /* Ensures numbers and units align vertically */
+}
+
+.windSpeed {
+    font-size: 55px;
+    font-weight: 900;
+    color: white;
+    margin: 0;
+    padding: 0;
+}
+
+.hcwsOne {
+    font-size: 20px;
+    font-weight: 400;
+    color: white;
+    margin: 0;
+    padding: 0;
+    line-height: 1; /* Ensures it aligns better with the large number */
+}
+
+.hcwsTwo {
+    font-size: 20px;
+    font-weight: 300;
+    color: white;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    width: 100%;
+}
+
+.catContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-left: 100px; /* Space between the icon and the text */
+}
+.hcCat{
+    font-size: 55px;
+    font-weight: 900;
+    color: white;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+.hcCatTwo{
+    font-size: 20px;
+    font-weight: 300;
+    color: white;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+    width: 100%;
+}
+
+.hcPressureContainer{
+    position: relative;
+    display: flex; /* Flexbox to align items horizontally */
+    align-items: center; /* Vertically align icon and text */
+    justify-content: center;
+    color: white;
+    background-color: #181818;
+    padding: 10px;
+    font-family: "Roboto", sans-serif;
+    margin: 0 auto;
+}
+
+.hcData {
+    display: flex;
+    align-items: baseline; /* Ensures numbers and units align vertically */
+}
+
+.hcPressure {
+    font-size: 25px;
+    font-weight: 800;
+    color: white;
+    margin: 0px 30px;
+    padding: 0;
+    line-height: 1; /* Ensures it aligns better with the large number */
+}
+
+.hcPOne {
+    font-size: 20px;
+    font-weight: 400;
+    color: white;
+    margin: 0;
+    padding: 0;
+    line-height: 1; /* Ensures it aligns better with the large number */
+}
+
+.hcMovingContainer{
+    position: relative;
+    display: flex; /* Flexbox to align items horizontally */
+    align-items: center; /* Vertically align icon and text */
+    justify-content: center;
+    color: white;
+    background-color: #181818;
+    padding: 10px;
+    font-family: "Roboto", sans-serif;
+    margin: 0 auto;
+}
+
+.hcMoving {
+    font-size: 25px;
+    font-weight: 800;
+    color: white;
+    margin: 0px 30px;
+    padding: 0;
+    line-height: 1; /* Ensures it aligns better with the large number */
+}
+
+.hcMOne {
+    font-size: 20px;
+    font-weight: 400;
+    color: white;
+    margin: 0;
+    padding: 0;
+    line-height: 1; /* Ensures it aligns better with the large number */
+}
+
+.nextAdvisory {
+    background-color: #181818;
+    font-family: "Roboto", sans-serif;
+}
+.nextAdvisText{
+    margin: 0;
+    padding: 10px;
+    text-align: center;
+    font-size: 20px;
+    font-weight: 200;
+    color: white;
+}
+
+.hcSat {
+    height: 300px;
+}
+#mainFrame{
+    position: absolute;
+    width: 70%;
+    height: 100%;
+}
+#map {
+    height: 100%;
+    width: 100%;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+}
+#rss-feed{
+    margin: 0px;
+    padding: 0px;
+}
+#infoContent{
+    margin: 0px;
+    padding: 0px;
+}
+.mainFrame{
+    margin: 0px;
+    padding: 0px;
+    width: 70%
+}
+
+#cameraWrapper{
+    width: 33%;
+    height: 25%;
+    display: inline flow-root list-item;
+}
+#cameraLocation{
+ text-align: center;
+ color: white;
+ font-family: roboto;
+ font-weight: 300;
+ margin: 5px;
+}
+#cameraLink{
+    width: 100%;
+    height: 187px;
+}
+
+
+/* Camera System */
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+h1 {
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 30px;
+    font-weight: 600;
+}
+
+/* Button Styles */
+button {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    cursor: pointer;
+    border: none;
+    border-radius: 3px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    font-family: inherit;
+}
+
+.btn-primary {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #920A0C;
+    color: white;
+    padding: 8px 16px;
+    font-size: 14px;
+}
+
+.btn-primary:hover {
+    background-color: #AC0E0D;
+}
+
+.btn-secondary {
+    background-color: #95a5a6;
+    color: white;
+    padding: 8px 16px;
+    font-size: 14px;
+}
+
+.btn-secondary:hover {
+    background-color: #7f8c8d;
+}
+
+.btn-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    background-color: transparent;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.btn-icon:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.btn-icon svg, 
+.btn-icon .material-icons {
+    width: 16px;
+    height: 16px;
+    font-size: 16px;
+    fill: currentColor;
+}
+
+/* Controls Section */
+.controls {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* Grid Layout */
+.camera-grid {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+/* Camera Card Styles */
+.camera-card {
+    background-color: #920A0C;
+    border-radius: 0;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.camera-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+}
+
+.camera-header {
+    padding: 10px 15px;
+    background-color: #920A0C;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #AC0E0D;
+    height: 40px;
+}
+
+.camera-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex-grow: 1;
+}
+
+.camera-live-badge {
+    background-color: #e74c3c;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 10px;
+    font-weight: bold;
+    margin-left: 8px;
+}
+
+.camera-actions {
+    display: flex;
+    gap: 6px;
+}
+
+.camera-player {
+    width: 100%;
+    height: 225px;
+    background-color: #000;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.camera-offline {
+    color: #fff;
+    font-size: 16px;
+    text-align: center;
+    padding: 20px;
+}
+
+.camera-info {
+    padding: 8px 15px;
+    border-top: 2px solid #AC0E0D;
+    color: white;
+    height: 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.camera-location {
+    font-size: 13px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+}
+
+.camera-location::before {
+    content: "📍";
+    margin-right: 6px;
+    font-size: 15px;
+}
+
+.camera-source {
+    font-size: 11px;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Modal Styles */
+.modal {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+}
+
+.modal-content {
+    background-color: white;
+    margin: 5% auto;
+    padding: 25px;
+    border-radius: 0;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    position: relative;
+}
+
+.close {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    font-size: 24px;
+    color: #95a5a6;
+    cursor: pointer;
+    transition: color 0.2s ease;
+    background: none;
+    border: none;
+    padding: 0;
+}
+
+.close:hover {
+    color: #e74c3c;
+}
+
+/* Form Styles */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #2c3e50;
+    font-size: 14px;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    font-size: 14px;
+    transition: border-color 0.2s ease;
+    box-sizing: border-box;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #3498db;
+}
+
+.form-hint {
+    display: block;
+    margin-top: 6px;
+    font-size: 12px;
+    color: #95a5a6;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .camera-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .camera-title {
+        font-size: 15px;
+    }
+    
+    .modal-content {
+        margin: 10% auto;
+        padding: 20px;
+    }
+}

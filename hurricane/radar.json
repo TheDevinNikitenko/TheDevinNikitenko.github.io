@@ -1,0 +1,16 @@
+{
+    "mlb" : {
+        "name" : "National Weather Service Melbourne",
+        "longlat" : "",
+        "radars" : [
+            {
+                "name" : "reflectivity",
+                "uri" : "http://mesonet.agron.iastate.edu/data/gis/images/4326/ridge/MLB/N0B_0.png"
+            },
+            {
+                "name" : "velocity",
+                "uri" : "http://mesonet.agron.iastate.edu/data/gis/images/4326/ridge/MLB/N0S_0.png"
+            }
+        ]
+    }
+}

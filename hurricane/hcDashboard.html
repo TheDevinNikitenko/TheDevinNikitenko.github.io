@@ -1,0 +1,148 @@
+<!-- CAMERA SYSTEM CODE 66f4c6b598838 -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hurricane Dashboard</title>
+    <!-- Styling for page -->
+    <link rel="stylesheet" href="hccss.css">
+    <!-- Moment.js -->
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.30.1/moment.min.js"></script>
+    <!-- Leaflet (JS/CSS) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900&display=swap" rel="stylesheet">
+    <!-- Leaflet-KMZ -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/shpjs/3.6.3/shp.min.js"></script>
+    <!-- Supabase Camera System -->
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+</head>
+<body>
+    <div class="hurricaneInfo">
+        <div class="hcName">
+            <!-- Container for both icon and overlaid text -->
+            <div class="iconContainer">
+                <img class="hurricaneIcon" src="hurricane.png">
+                <p class="hurricaneStrengthIcon" id="hcTitleCat">1</p> <!-- This text will overlay the icon -->
+            </div>
+
+            <!-- Text information about the hurricane -->
+            <div class="hurricaneTextContainer">
+                <p class="hurricaneName" id="hurricaneNameLine1">HURRICANE</p>
+                <p class="hurricaneCategory" id="hurricaneNameLine2">HELENE</p>
+            </div>
+        </div>
+
+        <div class="latestAdvisory">
+            <p class="latestAdvisText" id="LatestAdvis">Latest Advisory: 2:00 EST</p>
+        </div>
+        <div class="hcWindStrength">
+            <div class="windContainer">
+                <div class="windData">
+                    <p class="windSpeed" id="MaxSustainedWind">85</p>
+                    <p class="hcwsOne">MPH</p>
+                </div>
+                <p class="hcwsTwo">Wind</p>
+            </div>
+            <div class="catContainer">
+                <p class="hcCat" id="StormCatLevel">1</p>
+                <p class="hcCatTwo">Category</p>
+            </div>
+        </div>
+        <div class="hcPressureContainer">
+            <div class="hcData">
+                <p class="hcPOne">Pressure</p>
+                <p class="hcPressure" id="MinimumPressure">978 mb</p>
+            </div>
+        </div>
+        <div class="hcMovingContainer">
+            <div class="hcData">
+                <p class="hcMOne">Moving</p>
+                <p class="hcMoving" id="StormMovement">N at 12 MPH</p>
+            </div>
+        </div>
+        <!--
+        <div class="nextAdvisory">
+            <p class="nextAdvisText">Next Advisory: 6:00 EST</p>
+        </div>
+        -->
+        <div class="hcSat">
+            <div id="map"></div>
+        </div>
+    </div>
+
+    <div class="mainFrame" id="MainFrame">
+        <!-- <iframe src="http://wxwatchers.xyz/" frameborder="0"></iframe> -->
+        <!-- <div class="cameraSetup" id="CameraSetup">
+            <div class="newCam" id="cameraWrapper">
+                <h3 class="camLoc" id="cameraLocation">Tampa, FL | Bayshore</h3>
+                <iframe class="camLink" id="cameraLink" allowfullscreen webkitallowfullscreen mozallowfullscreen src="https://video.nest.com/embedded/live/07HXbrxF2c?autoplay=1" frameborder="0" width="720" height="576"></iframe>
+            </div>
+            <div class="newCam" id="cameraWrapper">
+                <h3 class="camLoc" id="cameraLocation">Tampa, FL | CC Pwkway</h3>
+                <iframe class="camLink" id="cameraLink" allowfullscreen webkitallowfullscreen mozallowfullscreen src="https://video.nest.com/embedded/live/tKfe2W8qHf?autoplay=1" frameborder="0" width="720" height="576"></iframe>
+            </div>
+            <div class="newCam" id="cameraWrapper">
+                <h3 class="camLoc" id="cameraLocation">Steinhatchee River, FL | 1</h3>
+                <iframe class="camLink" id="cameraLink" allowfullscreen webkitallowfullscreen mozallowfullscreen src="https://video.nest.com/embedded/live/3hZYbXwhNW?autoplay=1" frameborder="0" width="720" height="576"></iframe>
+            </div>
+            <div class="newCam" id="cameraWrapper">
+                <h3 class="camLoc" id="cameraLocation">St. Marks River, FL | Bridge</h3>
+                <iframe class="camLink" id="cameraLink" allowfullscreen webkitallowfullscreen mozallowfullscreen src="https://video.nest.com/embedded/live/aRz6Beyjj2?autoplay=1" frameborder="0" width="720" height="576"></iframe>
+            </div>
+            <div class="newCam" id="cameraWrapper">
+                <h3 class="camLoc" id="cameraLocation">St. Marks, FL | 1</h3>
+                <iframe class="camLink" id="cameraLink" allowfullscreen webkitallowfullscreen mozallowfullscreen src="https://video.nest.com/embedded/live/nWLeZLufuX?autoplay=1" frameborder="0" width="720" height="576"></iframe>
+            </div>
+            <div class="newCam" id="cameraWrapper">
+                <h3 class="camLoc" id="cameraLocation">St. Marks, FL | 2</h3>
+                <iframe class="camLink" id="cameraLink" allowfullscreen webkitallowfullscreen mozallowfullscreen src="https://www.youtube.com/embed/3p3QqHMWFX8?autoplay=1" frameborder="0" width="720" height="576"></iframe>
+            </div>
+            <div class="newCam" id="cameraWrapper">
+                <h3 class="camLoc" id="cameraLocation">Cedar Key, FL | Tiki Interior</h3>
+                <iframe class="camLink" id="cameraLink" allowfullscreen webkitallowfullscreen mozallowfullscreen src="https://www.youtube.com/embed/-fxT1SaVae0?autoplay=1" frameborder="0" width="720" height="576"></iframe>
+            </div>
+            <div class="newCam" id="cameraWrapper">
+                <h3 class="camLoc" id="cameraLocation">Cedar Key, FL | Tiki Exterior</h3>
+                <iframe class="camLink" id="cameraLink" allowfullscreen webkitallowfullscreen mozallowfullscreen src="https://video.nest.com/embedded/live/8MhiCR482Y?autoplay=1" frameborder="0" width="720" height="576"></iframe>
+            </div>
+        </div> -->
+
+    </div>
+
+    <div id="rss-feed"></div>
+
+    
+    <div id="infoBox">
+        <div id="infoContent" class="leaflet-popup-content"></div>
+    </div>
+
+    <script type='text/javascript' src='js/rss-feed.js'></script>
+    <script type='text/javascript' src='js/moment.js'></script>
+    <script type='text/javascript' src='js/map.js'></script>
+    <script type='text/javascript' src='js/shpLoader2.js'></script>
+    <script type='text/javascript' src='js/weathertile.js'></script>
+    <script type='text/javascript' src='js/NWSAlerts.js'></script>
+    <script type='text/javascript' src='js/mainFrameMenu.js'></script>
+    <script type='text/javascript' src='js/supabaseCameraSystem.js'></script>
+
+    <!-- SPINS THE HURRICANE INFORMATION HURRICANE ICON -->
+    <script>
+        window.onload = function() {
+            // Ensure all styles and elements are loaded before adding the spin class
+            const hurricaneIcon = document.querySelector('.hurricaneIcon');
+            hurricaneIcon.classList.add('spin-animation');
+        };
+    </script>
+</body>
+</html>
