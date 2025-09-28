@@ -3,22 +3,19 @@ let weatherLayer
 // https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/nexrad-n0q-900913/{z}/{x}/{y}.png -- REXRAD Base Reflectivity current
 // https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/nexrad-eet-900913/{z}/{x}/{y}.png -- NEXRAD Echo Tops EET current
 // https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/conus-goes-ir-4km/{z}/{x}/{y}.png -- 
-<<<<<<< HEAD
 // https://tilecache.rainviewer.com/v2/radar/{z}/{x}/{y}/{time}/256/{color}.png -- RAINVIWER
-=======
->>>>>>> 5588edd043f93d887c0cc1195e99837b82f45542
 
 async function addWeatherLayer() {
     weatherLayer = L.tileLayer('https://mesonet.agron.iastate.edu/cache/tile.py/1.0.0/nexrad-n0q-900913/{z}/{x}/{y}.png', {
         attribution: '© Iowa Environmental Mesonet'
     });
 
-    weatherLayer.addTo(map);
+    // weatherLayer.addTo(map);
 };
 
 addWeatherLayer();
 
-async function checkForWeatherLayer() {
+function checkForWeatherLayer() {
     if (map.hasLayer(weatherLayer)) {
         map.removeLayer(weatherLayer);
         setTimeout(function(){

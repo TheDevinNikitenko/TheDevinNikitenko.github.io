@@ -271,6 +271,10 @@ body{
     bottom: 0;
     left: 0;
 }
+#map2 {
+    height: 100vh;
+    width: 100%;
+}
 #rss-feed{
     margin: 0px;
     padding: 0px;

@@ -1,7 +1,18 @@
 // Fetch data from NWS API for /alerts/active
 async function fetchGeoJSONData() {
     try {
-        const response = await fetch('https://api.weather.gov/alerts/active?limit=500');
+        const response = await fetch('https://api.weather.gov/alerts/active', {
+            headers: {
+                'User-Agent': 'tropical tracker (devinnikitenko@yahoo.com)', // Required by weather.gov API
+                'Accept': 'application/geo+json',
+            }
+        });
+        
+        // Check if the response is OK
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
         const data = await response.json();
         return data.features;
     } catch (error) {
@@ -17,18 +28,14 @@ async function initAlerts() {
     alertLayer = L.geoJSON(alertData, {
         style: getAlertStyle,
         onEachFeature: onEachAlertFeature
-    }).addTo(map);
+    }).addTo(map2);
 
     alertLayer.once("load", function () {
         removeAllLayersExcept(alertLayer);
     });
 
     // Update the last updated time
-<<<<<<< HEAD
     //updateLastUpdatedTime();
-=======
-    updateLastUpdatedTime();
->>>>>>> 5588edd043f93d887c0cc1195e99837b82f45542
 }
 
 // Function to get the style based on the alert event type
@@ -105,14 +112,10 @@ function updateLastUpdatedTime() {
 async function checkForAlertsLayer() {
     if (map.hasLayer(alertLayer)) {
         map.removeLayer(alertLayer);
-<<<<<<< HEAD
-        initAlerts();
-=======
         setTimeout(initAlerts, 500);
->>>>>>> 5588edd043f93d887c0cc1195e99837b82f45542
     }
 }
 
 // Initialize alerts and set an interval to refresh them
-initAlerts();
-setInterval(checkForAlertsLayer, 60 * 1000);
+// initAlerts();
+// setInterval(checkForAlertsLayer, 60 * 1000);

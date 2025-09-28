@@ -25,7 +25,47 @@ async function loadShapefileLayer(layerId, shpUrl, map, options = {}) {
         const defaultOptions = {
             style: (feature) => {
                 // Check if this is an AOI feature with RISK2DAY property
-                if (feature && feature.properties && feature.properties.RISK2DAY) {
+                if (feature && feature.properties && feature.properties.TCWW){
+                    const alerttype = feature.properties.TCWW
+
+                    if (alerttype === "TWA") {
+                        return {
+                            color: '#fef852',      // Tropical Storm Watch
+                            weight: 3,
+                            opacity: 0.8,
+                            fillColor: '#90ee90',
+                            fillOpacity: 0.2,
+                            dashArray: null    //'5, 10'
+                        }
+                    } else if (alerttype === "TWR") {
+                        return {
+                            color: '#2349f6',      // Tropical Storm Warning
+                            weight: 3,
+                            opacity: 0.9,
+                            fillColor: '#ffa500',
+                            fillOpacity: 0.3,
+                            dashArray: null 
+                        }
+                    } else if (alerttype === "HWA") {
+                        return {
+                            color: '#f6c1cb',      // Hurricane Watch
+                            weight: 3,
+                            opacity: 0.8,
+                            fillColor: '#ffff99',
+                            fillOpacity: 0.2,
+                            dashArray: null  //'5, 10'
+                        }
+                    } else if (alerttype === "HWR") {
+                        return {
+                            color: '#ed3731',      // Hurricane Warning
+                            weight: 4,
+                            opacity: 0.9,
+                            fillColor: '#ff6b6b',
+                            fillOpacity: 0.4,
+                            dashArray: null 
+                        }
+                    }
+                } else if (feature && feature.properties && feature.properties.RISK2DAY) {
                     const risk = feature.properties.RISK2DAY;
                     
                     // Style based on risk level
@@ -58,10 +98,10 @@ async function loadShapefileLayer(layerId, shpUrl, map, options = {}) {
                 
                 // Default style for non-AOI features
                 return {
-                    color: '#3388ff',
+                    color: '#ff0000',
                     weight: 2,
                     opacity: 0.8,
-                    fillColor: '#3388ff',
+                    fillColor: 'lightblue',
                     fillOpacity: 0.2
                 };
             },
@@ -129,6 +169,14 @@ async function loadShapefileLayer(layerId, shpUrl, map, options = {}) {
             onEachFeature: (feature, layer) => {
                 // Add popup with feature properties
                 if (feature.properties) {
+                    // Debug: log TCWW features to console
+                    if (feature.properties.TCWW) {
+                        console.log('TCWW Feature detected:', {
+                            TCWW: feature.properties.TCWW,
+                            geometry: feature.geometry.type
+                        });
+                    }
+
                     let popupContent = '<div><strong>Feature Properties:</strong><br>';
                     for (const [key, value] of Object.entries(feature.properties)) {
                         if (value !== null && value !== undefined && value !== '') {
@@ -145,8 +193,7 @@ async function loadShapefileLayer(layerId, shpUrl, map, options = {}) {
         const mergedOptions = {
             ...defaultOptions,
             ...options,
-            // For the style function, we need to preserve the function if it exists in defaults
-            style: options.style || defaultOptions.style
+            
         };
 
         console.log(`Loading shapefile from: ${shpUrl}`);
@@ -325,11 +372,6 @@ loadShapefileLayer(
     'https://corsproxy.io/?https://www.nhc.noaa.gov/gis/forecast/archive/al092025_5day_latest.zip',
     map,
     {
-        style: {
-            color: 'red',
-            weight: 3,
-            fillColor: 'lightblue',
-            fillOpacity: 0.2
-        }
+        
     }
 );

@@ -6,7 +6,7 @@ const initializeSupabase = () => {
 };
 
 // Main application
-document.addEventListener('DOMContentLoaded', async () => {
+async function initializeCameraSystem() {
     try {
         // Initialize Supabase
         const supabase = initializeSupabase();
@@ -324,4 +324,4 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error('Application initialization failed:', error);
         alert('Failed to initialize the application. Check console for details.');
     }
-});
+};

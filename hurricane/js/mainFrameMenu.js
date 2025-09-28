@@ -1,6 +1,5 @@
-// Create the menu structure
+// Modified menu creation with callback support
 function createMenu() {
-    // Create menu container
     const menuContainer = document.createElement('div');
     menuContainer.id = 'mainFrameMenu';
     menuContainer.style.cssText = `
@@ -12,15 +11,27 @@ function createMenu() {
         flex-wrap: wrap;
     `;
 
-    // Create menu items
     const menuItems = [
-        { id: 'cameras', label: 'Camera Feeds', content: getCameraContent() },
-        { id: 'weather', label: 'Weather Data', content: '<div style="padding: 20px; text-align: center;"><h3>Weather Data View</h3><p>Weather information will be displayed here</p></div>' },
-        { id: 'radar', label: 'Radar', content: '<div style="padding: 20px; text-align: center;"><h3>Radar View</h3><p>Radar data will be displayed here</p></div>' },
-        { id: 'alerts', label: 'Alerts', content: '<div style="padding: 20px; text-align: center;"><h3>Alerts View</h3><p>Weather alerts will be displayed here</p></div>' }
+        { 
+            id: 'cameras', 
+            label: 'Camera Feeds', 
+            content: getCameraContent(),
+            callback: initializeCameraSystem // Reference to your camera init function
+        },
+        { 
+            id: 'radar', 
+            label: 'Weather Radar', 
+            content: getRadarMap(),
+            callback: initializeMap2
+        },
+        { 
+            id: 'weather', 
+            label: 'Weather Data', 
+            content: '<div style="padding: 20px; text-align: center;"><h3>Weather Data View</h3><p>Weather information will be displayed here</p></div>',
+        },
+        // ... other menu items
     ];
 
-    // Add menu buttons
     menuItems.forEach((item, index) => {
         const button = document.createElement('button');
         button.id = `menu-${item.id}`;
@@ -36,16 +47,6 @@ function createMenu() {
             font-weight: 500;
             transition: background 0.3s ease;
         `;
-        
-        button.addEventListener('mouseenter', () => {
-            button.style.background = '#2980b9';
-        });
-        
-        button.addEventListener('mouseleave', () => {
-            if (!button.classList.contains('active')) {
-                button.style.background = '#3498db';
-            }
-        });
 
         button.addEventListener('click', () => {
             // Remove active class from all buttons
@@ -58,11 +59,10 @@ function createMenu() {
             button.classList.add('active');
             button.style.background = '#e74c3c';
             
-            // Update mainFrame content
-            updateMainFrameContent(item.content);
+            // Update mainFrame content and run callback
+            updateMainFrameContent(item.content, item.callback);
         });
 
-        // Set first button as active by default
         if (index === 0) {
             button.classList.add('active');
             button.style.background = '#e74c3c';
@@ -71,21 +71,34 @@ function createMenu() {
         menuContainer.appendChild(button);
     });
 
-    // Insert menu before mainFrame
     const mainFrame = document.getElementById('MainFrame');
     mainFrame.parentNode.insertBefore(menuContainer, mainFrame);
 
-    // Load initial content
-    updateMainFrameContent(menuItems[0].content);
+    // Load initial content with callback
+    updateMainFrameContent(menuItems[0].content, menuItems[0].callback);
 }
 
-// Function to update mainFrame content
-function updateMainFrameContent(content) {
+// Modified update function to handle callbacks
+function updateMainFrameContent(content, callback = null) {
     const mainFrame = document.getElementById('MainFrame');
     mainFrame.innerHTML = content;
+    
+    // Wait for DOM to be updated, then run callback
+    setTimeout(() => {
+        if (callback && typeof callback === 'function') {
+            callback();
+        }
+    }, 100);
 }
 
-// Function to generate camera content (using your commented-out camera structure)
+// Function to generate radar content
+function getRadarMap() {
+    return `
+    <div id="map2"></div>
+    `;
+}
+// Function to generate camera content
+
 function getCameraContent() {
     return `
     <div class="cameras" id="cameraSystem">  
@@ -159,8 +172,10 @@ function getCameraContent() {
         </div>
     </div>
 </div>
-    `;
+    `
 }
+
+
 
 // Enhanced version with grid layout for cameras
 function getCameraContentGrid() {
