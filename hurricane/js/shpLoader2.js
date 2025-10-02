@@ -71,10 +71,10 @@ async function loadShapefileLayer(layerId, shpUrl, map, options = {}) {
                     // Style based on risk level
                     if (risk === 'Low') {
                         return {
-                            color: '#00ff00',      // Green border
+                            color: '#d1cb49',      // Darker Yellow Border
                             weight: 2,
                             opacity: 0.8,
-                            fillColor: '#90EE90',  // Light green fill
+                            fillColor: '#fcf568',  // Yellow Fill
                             fillOpacity: 0.3
                         };
                     } else if (risk === 'Medium') {
@@ -330,18 +330,13 @@ function updateLayerStyle(layerId, newStyle) {
     return false;
 }
 
-/*
+// Load NHC OUTLOOK
 loadShapefileLayer(
     'nhc-outlook', 
     'https://corsproxy.io/?https://www.nhc.noaa.gov/xgtwo/gtwo_shapefiles.zip',
     map,
     {
-        style: {
-            color: 'red',
-            weight: 3,
-            fillOpacity: 0.3
-        },
-        fitBounds: true
+       
     }
 ).then(result => {
     if (result.success) {
@@ -350,28 +345,14 @@ loadShapefileLayer(
         console.error('Failed to load layer:', result.error);
     }
 });
-*/
-
-// Load another layer with different styling
+/*
+// Load Hurricane (NAME)
 loadShapefileLayer(
-    'nhc-humberto', 
-    'https://corsproxy.io/?https://www.nhc.noaa.gov/gis/forecast/archive/al082025_5day_latest.zip',
-    map,
-    {
-        style: {
-            color: 'red',
-            weight: 3,
-            fillColor: 'lightblue',
-            fillOpacity: 0.2
-        }
-    }
-);
-
-loadShapefileLayer(
-    'nhc-tdNine', 
+    'nhc-INVEST_NUMBER', 
     'https://corsproxy.io/?https://www.nhc.noaa.gov/gis/forecast/archive/al092025_5day_latest.zip',
     map,
     {
-        
+
     }
 );
+*/
