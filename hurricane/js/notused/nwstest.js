@@ -13,7 +13,7 @@ async function fetchGeoJSONData() {
 async function initAlerts() {
     const alertData = await fetchGeoJSONData();
 
-    onEachFeature: function (feature, layer) {
+    onEachFeature: function test(feature, layer) {
         var title = feature.properties.event || "No event name provided";
         var sender = feature.properties.senderName;
         var windSpeed = "Wind Gust: " + feature.properties.parameters.maxWindGust || "No wind gust provided.";

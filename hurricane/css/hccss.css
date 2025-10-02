@@ -19,7 +19,7 @@ body{
     display: flex; /* Flexbox to align items horizontally */
     align-items: center; /* Vertically align icon and text */
     color: white;
-    background-image: url(hcBg.jpg);
+    background-image: url(../img/hcBg.jpg);
     background-position: center;
 }
 
