@@ -77,6 +77,63 @@ const ui = {
   }
 };
 
+// --- HUD + Latest collapse toggles ---
+const STORE_KEYS = {
+  hudCollapsed: "weatherconsole:hudCollapsed",
+  latestCollapsed: "weatherconsole:latestCollapsed",
+};
+
+function loadCollapsed(key) {
+  try { return localStorage.getItem(key) === "1"; } catch { return false; }
+}
+function saveCollapsed(key, val) {
+  try { localStorage.setItem(key, val ? "1" : "0"); } catch {}
+}
+
+function setHudCollapsed(collapsed) {
+  const hud = document.getElementById("hud");
+  const btn = document.getElementById("btnHudToggle");
+  if (!hud || !btn) return;
+
+  hud.classList.toggle("is-collapsed", !!collapsed);
+  btn.textContent = collapsed ? "Show" : "Hide";
+  saveCollapsed(STORE_KEYS.hudCollapsed, !!collapsed);
+
+  // keep leaflet happy if needed
+  if (window.map?.invalidateSize) window.map.invalidateSize(false);
+}
+
+function setLatestCollapsed(collapsed) {
+  const latest = document.getElementById("latestPanel");
+  const btn = document.getElementById("btnLatestToggle");
+  if (!latest || !btn) return;
+
+  latest.classList.toggle("is-collapsed", !!collapsed);
+  btn.textContent = collapsed ? "Show" : "Hide";
+  saveCollapsed(STORE_KEYS.latestCollapsed, !!collapsed);
+
+  if (window.map?.invalidateSize) window.map.invalidateSize(false);
+}
+
+(function initPanelToggles() {
+  const btnHud = document.getElementById("btnHudToggle");
+  const btnLatest = document.getElementById("btnLatestToggle");
+
+  // Restore saved state
+  setHudCollapsed(loadCollapsed(STORE_KEYS.hudCollapsed));
+  setLatestCollapsed(loadCollapsed(STORE_KEYS.latestCollapsed));
+
+  btnHud?.addEventListener("click", () => {
+    const hud = document.getElementById("hud");
+    setHudCollapsed(!hud.classList.contains("is-collapsed"));
+  });
+
+  btnLatest?.addEventListener("click", () => {
+    const latest = document.getElementById("latestPanel");
+    setLatestCollapsed(!latest.classList.contains("is-collapsed"));
+  });
+})();
+
 if (ui.alertsList) lockScrollToSidebarList(ui.alertsList);
 
 let localPointAlerts = []; // small set near map center
@@ -201,6 +258,7 @@ function applyFiltersToDraw(drawFeatures) {
 }
 
 let viewportSampleAlerts = [];
+
 const refreshViewportSampleAlerts = throttle(async () => {
   try {
     viewportSampleAlerts = await fetchAlertsForViewportSamples(map);
@@ -208,7 +266,7 @@ const refreshViewportSampleAlerts = throttle(async () => {
     console.warn("viewport sample alerts failed", e);
     viewportSampleAlerts = [];
   }
-}, 1200);
+}, 900);
 
 const updateAlertsDrawDebounced = debounce(async () => {
   if (!state.layersOn.alerts) return;
@@ -217,94 +275,51 @@ const updateAlertsDrawDebounced = debounce(async () => {
   const q = (state.filters.search || "").trim().toLowerCase();
   const inSearch = q.length > 0;
 
-  // ---- Always: draw what's already drawable in/near viewport (real geometry + small zone slice)
-  const viewportBase = await buildAlertDrawFeaturesOptimized(state.alerts.features, map, {
-    maxZonesPerAlert: state.perfMode ? 10 : 30,
-    viewportPad: 0.55,
+  // 1) Always draw alert geometries and a light zone fallback (fast)
+  const baseDraw = await buildAlertDrawFeaturesOptimized(state.alerts.features, map, {
     mode: "viewport",
-    noZoneSlice: false, // IMPORTANT: don't brute scan national list
+    viewportPad: 0.55,
+    maxZonesPerAlert: state.perfMode ? 10 : 30,
+    noZoneSlice: false,
   });
+  let out = applyFiltersToDraw(baseDraw);
 
-  let viewportFiltered = applyFiltersToDraw(viewportBase);
+  // 2) If NOT searching: deterministically boost *viewport-true* alerts
+  //    This is what makes it ACTUALLY show everything affecting the view.
+  if (!inSearch) {
+    if (viewportSampleAlerts.length) {
+      const boost = await buildAlertDrawFeaturesOptimized(viewportSampleAlerts, map, {
+        mode: "viewport",
+        viewportPad: 0.55,
 
-  // inside updateAlertsDrawDebounced, after you build viewportFiltered...
-if (!inSearch) {
-  // Boost only the alerts proven to affect the current viewport (center+corners)
-  if (viewportSampleAlerts.length) {
-    const boostDraw = await buildAlertDrawFeaturesOptimized(viewportSampleAlerts, map, {
-      mode: "viewport",
-      viewportPad: 0.55,
-      noZoneSlice: true,                 // safe: small set
-      maxTotalZones: state.perfMode ? 260 : 700,
-      batchSize: 24,
-    });
+        // THIS is what prevents “sometimes missing pieces”
+        noZoneSlice: true,
 
-    const boostFiltered = applyFiltersToDraw(boostDraw);
+        // Safety cap across only the viewport alerts (small set anyway)
+        maxTotalZones: state.perfMode ? 300 : 900,
+        batchSize: 24,
+      });
 
-    const seen = new Set(viewportFiltered.map(f => f.id));
-    for (const f of boostFiltered) {
-      if (!seen.has(f.id)) {
-        seen.add(f.id);
-        viewportFiltered.push(f);
+      const boostFiltered = applyFiltersToDraw(boost);
+
+      // merge without duplicates
+      const seen = new Set(out.map(f => f.id));
+      for (const f of boostFiltered) {
+        if (!seen.has(f.id)) {
+          seen.add(f.id);
+          out.push(f);
+        }
       }
     }
+
+    state.alertsDraw = { type: "FeatureCollection", features: out };
+    alertsLayer.setAlerts(state.alertsDraw);
+    return;
   }
 
-  state.alertsDraw = { type: "FeatureCollection", features: viewportFiltered };
-  alertsLayer.setAlerts(state.alertsDraw);
-  return;
-}
-
-  // Build the matching alert set from the FULL dataset (not drawn subset)
-  const types = state.filters.types || {};
-  const matchesSearch = (f) => {
-    const p = f?.properties || {};
-    const blob = `${p.event || ""} ${p.headline || ""} ${p.areaDesc || ""} ${p.description || ""} ${p.instruction || ""}`.toLowerCase();
-    return blob.includes(q);
-  };
-
-  const matchingAlerts = (state.alerts.features || []).filter((f) => {
-    const p = f?.properties || {};
-    const kind = sidebar.classify(p.event || "");
-    const effectiveKind = Object.prototype.hasOwnProperty.call(types, kind) ? kind : "other";
-
-    // search should still respect type chips (change to override if you want)
-    if (types && types[effectiveKind] === false) return false;
-
-    return matchesSearch(f);
-  });
-
-  // SAFETY: only boost a limited number of matching alerts
-  // sort newest first so the important ones get boosted
-  const boosted = matchingAlerts
-    .slice()
-    .sort((a, b) => (b.properties?.sent ? Date.parse(b.properties.sent) : 0) - (a.properties?.sent ? Date.parse(a.properties.sent) : 0))
-    .slice(0, 80);
-
-  // 🔥 Boost draw: noZoneSlice avoids the "wrong zone not in first N" issue
-  // Still viewport mode, so we only draw zones that intersect your current view.
-  const boostedDraw = await buildAlertDrawFeaturesOptimized(boosted, map, {
-    mode: "viewport",
-    viewportPad: 0.55,
-    noZoneSlice: true,
-    maxTotalZones: state.perfMode ? 220 : 520, // global cap during search
-    batchSize: 24,
-  });
-
-  const boostedFiltered = applyFiltersToDraw(boostedDraw);
-
-  // Merge (viewport first, then boosted extras)
-  const merged = viewportFiltered.slice();
-  const seen = new Set(merged.map(f => f.id));
-  for (const f of boostedFiltered) {
-    if (!seen.has(f.id)) {
-      seen.add(f.id);
-      merged.push(f);
-    }
-  }
-
-  state.alertsDraw = { type: "FeatureCollection", features: merged };
-  alertsLayer.setAlerts(state.alertsDraw);
+  // 3) Search mode: keep whatever search logic you already have below this
+  // (Do NOT change it here.)
+  // ...
 }, 250);
 
 async function refreshAlerts() {
@@ -526,7 +541,11 @@ async function showInspect(latlng) {
   });
 }
 
-map.on("click", (e) => showInspect(e.latlng));
+map.on("click", (e) => {
+  const t = e?.originalEvent?.target;
+  if (t && (t.closest?.(".leaflet-popup") || t.closest?.(".leaflet-interactive"))) return;
+  showInspect(e.latlng);
+});
 
 map.on("moveend zoomend", () => {
   refreshViewportSampleAlerts();

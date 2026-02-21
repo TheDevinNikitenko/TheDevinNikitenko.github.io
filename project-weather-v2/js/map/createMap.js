@@ -3,6 +3,7 @@ export function createMap(domId, { perfMode = true } = {}) {
     zoomControl: true,
     preferCanvas: perfMode,
     renderer: perfMode ? L.canvas() : undefined,
+    closePopupOnClick: false
   });
 
   // Dark basemap (no key)

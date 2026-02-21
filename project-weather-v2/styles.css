@@ -263,7 +263,6 @@ html, body {
   flex-direction: column;
   overflow: hidden;
   flex: 1;
-  min-height: 180px;
 }
 
 .latest__head{
@@ -589,4 +588,20 @@ html, body {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+/* Collapse behavior */
+.hud.is-collapsed .hud__section{
+  display: none !important;
+}
+
+.latest.is-collapsed .latest__list{
+  display: none !important;
+}
+
+/* Optional: tighten spacing when collapsed */
+.hud.is-collapsed{
+  padding-bottom: 10px;
+}
+.latest.is-collapsed{
+  padding-bottom: 10px;
 }

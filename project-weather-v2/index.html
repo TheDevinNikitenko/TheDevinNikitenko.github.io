@@ -69,7 +69,11 @@
     <div class="hud" id="hud">
       <div class="hud__top">
         <div class="hud__title">Controls</div>
-        <button class="hud__btn" id="btnRefresh">Refresh</button>
+
+        <div style="display:flex; gap:8px; align-items:center;">
+          <button class="hud__btn" id="btnHudToggle" type="button">Hide</button>
+          <button class="hud__btn" id="btnRefresh">Refresh</button>
+        </div>
       </div>
 
       <div class="hud__section">
@@ -112,7 +116,11 @@
     <div class="latest" id="latestPanel">
       <div class="latest__head">
         <div class="latest__title">Latest alerts</div>
-        <div class="latest__meta" id="latestMeta">—</div>
+
+        <div style="display:flex; gap:8px; align-items:center;">
+          <div class="latest__meta" id="latestMeta">—</div>
+          <button class="hud__btn" id="btnLatestToggle" type="button">Hide</button>
+        </div>
       </div>
       <div class="latest__list" id="latestList"></div>
     </div>
