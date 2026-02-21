@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Weather Console</title>
+
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  />
+
+  <!-- Turf (point-in-polygon / distance) -->
+  <script src="https://unpkg.com/@turf/turf@6.5.0/turf.min.js"></script>
+
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+
+<body>
+  <div class="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar__top">
+        <div class="brand">
+          <div class="brand__dot"></div>
+          <div class="brand__text">
+            <div class="brand__title">Weather Console</div>
+            <div class="brand__sub">Radar • Alerts • SPC • Obs • Lightning • Satellite</div>
+          </div>
+        </div>
+
+        <div class="status" id="statusLine">
+          <span class="status__pill">●</span>
+          <span class="status__text">Loading…</span>
+        </div>
+
+        <div class="search">
+          <input id="searchInput" type="text" placeholder="Filter alerts (type to search)…" />
+        </div>
+
+        <div class="typeFilters" id="typeFilters"></div>
+
+        <div class="severityGraphWrap">
+          <div class="severityTitle">Alert severity</div>
+          <div class="severityGraph" id="severityGraph"></div>
+        </div>
+      </div>
+
+      <div class="sidebar__list" id="alertsList"></div>
+
+      <div class="sidebar__bottom">
+        <div class="mini">
+          <div class="mini__label">Last update</div>
+          <div class="mini__value" id="lastUpdate">—</div>
+        </div>
+        <div class="mini">
+          <div class="mini__label">Alerts shown</div>
+          <div class="mini__value" id="countShown">0</div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+  <div id="map" class="map"></div>
+
+  <!-- Right overlay stack (HUD + Latest) -->
+  <div class="rightOverlay" id="rightOverlay">
+    <div class="hud" id="hud">
+      <div class="hud__top">
+        <div class="hud__title">Controls</div>
+        <button class="hud__btn" id="btnRefresh">Refresh</button>
+      </div>
+
+      <div class="hud__section">
+        <div class="hud__label">Layers</div>
+        <div class="hud__grid">
+          <label class="toggle"><input type="checkbox" id="togRadar" checked> Radar</label>
+          <label class="toggle"><input type="checkbox" id="togAlerts" checked> Alerts</label>
+          <label class="toggle"><input type="checkbox" id="togSPC"> SPC Day 1</label>
+          <label class="toggle"><input type="checkbox" id="togMETAR"> Stations</label>
+          <label class="toggle"><input type="checkbox" id="togLightning"> Lightning</label>
+          <label class="toggle"><input type="checkbox" id="togSat"> Satellite</label>
+        </div>
+      </div>
+
+      <div class="hud__section">
+        <div class="hud__label">Radar timeline</div>
+        <div class="radarControls">
+          <button class="hud__btn" id="radarPlay">Play</button>
+          <button class="hud__btn" id="radarPause">Pause</button>
+          <select class="hud__select" id="radarSpeed">
+            <option value="700">1x</option>
+            <option value="400">2x</option>
+            <option value="250">3x</option>
+          </select>
+        </div>
+        <input type="range" id="radarScrub" min="0" max="0" value="0" class="slider" />
+        <div class="hud__meta"><span id="radarStamp">—</span></div>
+      </div>
+
+      <div class="hud__section">
+        <div class="hud__label">Location</div>
+        <div class="hud__row">
+          <button class="hud__btn" id="btnLocate">Follow me</button>
+          <button class="hud__btn" id="btnStopLocate">Stop</button>
+        </div>
+        <div class="hud__meta" id="proximityLine">Proximity: —</div>
+      </div>
+    </div>
+
+    <div class="latest" id="latestPanel">
+      <div class="latest__head">
+        <div class="latest__title">Latest alerts</div>
+        <div class="latest__meta" id="latestMeta">—</div>
+      </div>
+      <div class="latest__list" id="latestList"></div>
+    </div>
+  </div>
+
+  <!-- Toast notifications -->
+  <div class="toasts" id="toasts"></div>
+
+  <!-- Point Inspect panel (required by app.js) -->
+<div class="inspect" id="inspectPanel" style="display:none;">
+  <div class="inspect__head">
+    <div class="inspect__title">Point Inspect</div>
+    <button class="inspect__close" id="inspectClose">✕</button>
+  </div>
+  <div class="inspect__body" id="inspectBody"></div>
+</div>
+</main>
+  </div>
+
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+  ></script>
+
+  <script type="module" src="./js/app.js"></script>
+</body>
+</html>
