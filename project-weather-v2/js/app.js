@@ -77,6 +77,28 @@ const ui = {
   }
 };
 
+let popupCooldownUntil = 0;
+
+function popupCooldownActive() {
+  return Date.now() < popupCooldownUntil;
+}
+
+function attachPopupCooldown() {
+  const m = window.__leafletMap;
+
+  // Wait until it exists and looks like a Leaflet map
+  if (!m || typeof m.on !== "function" || typeof m.getCenter !== "function") {
+    requestAnimationFrame(attachPopupCooldown);
+    return;
+  }
+
+  m.on("popupopen", () => {
+    popupCooldownUntil = Date.now() + 1200; // 1.2s
+  });
+}
+
+attachPopupCooldown();
+
 // --- HUD + Latest collapse toggles ---
 const STORE_KEYS = {
   hudCollapsed: "weatherconsole:hudCollapsed",
@@ -116,22 +138,29 @@ function setLatestCollapsed(collapsed) {
 }
 
 (function initPanelToggles() {
-  const btnHud = document.getElementById("btnHudToggle");
-  const btnLatest = document.getElementById("btnLatestToggle");
+  function bindTap(el, fn) {
+  if (!el) return;
+  el.addEventListener("pointerup", (e) => { e.preventDefault(); fn(e); }, { passive: false });
+  el.addEventListener("click", (e) => { e.preventDefault(); fn(e); });
+}
 
-  // Restore saved state
-  setHudCollapsed(loadCollapsed(STORE_KEYS.hudCollapsed));
-  setLatestCollapsed(loadCollapsed(STORE_KEYS.latestCollapsed));
+const btnHudToggle = document.getElementById("btnHudToggle");
+const btnLatestToggle = document.getElementById("btnLatestToggle");
+const hud = document.getElementById("hud");
+const latest = document.getElementById("latestPanel");
 
-  btnHud?.addEventListener("click", () => {
-    const hud = document.getElementById("hud");
-    setHudCollapsed(!hud.classList.contains("is-collapsed"));
-  });
+bindTap(btnHudToggle, () => {
+  const collapsed = !hud.classList.contains("is-collapsed");
+  hud.classList.toggle("is-collapsed", collapsed);
+  btnHudToggle.textContent = collapsed ? "Show" : "Hide";
+});
 
-  btnLatest?.addEventListener("click", () => {
-    const latest = document.getElementById("latestPanel");
-    setLatestCollapsed(!latest.classList.contains("is-collapsed"));
-  });
+bindTap(btnLatestToggle, () => {
+  const collapsed = !latest.classList.contains("is-collapsed");
+  latest.classList.toggle("is-collapsed", collapsed);
+  btnLatestToggle.textContent = collapsed ? "Show" : "Hide";
+});
+
 })();
 
 if (ui.alertsList) lockScrollToSidebarList(ui.alertsList);
@@ -271,6 +300,7 @@ const refreshViewportSampleAlerts = throttle(async () => {
 const updateAlertsDrawDebounced = debounce(async () => {
   if (!state.layersOn.alerts) return;
   if (!state.alerts?.features?.length) return;
+  if (state.popupLock) return;
 
   const q = (state.filters.search || "").trim().toLowerCase();
   const inSearch = q.length > 0;
@@ -548,6 +578,7 @@ map.on("click", (e) => {
 });
 
 map.on("moveend zoomend", () => {
+  if (popupCooldownActive()) return;
   refreshViewportSampleAlerts();
   updateAlertsDrawDebounced();
 });
@@ -662,7 +693,12 @@ if (ui.btnRefresh) {
     setStatus("Ready", "ok");
 
     setInterval(() => refreshRadar().catch(console.warn), REFRESH_RADAR_MS);
-    setInterval(() => refreshAlerts().catch(console.warn), REFRESH_ALERTS_MS);
+
+    setInterval(() => {
+  if (popupCooldownActive()) return;
+  refreshAlerts().catch(console.warn);
+}, REFRESH_ALERTS_MS);
+
     setInterval(() => { if (state.layersOn.spc) refreshSPC().catch(console.warn); }, REFRESH_SPC_MS);
   } catch (e) {
     console.error(e);

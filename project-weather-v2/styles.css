@@ -605,3 +605,13 @@ html, body {
 .latest.is-collapsed{
   padding-bottom: 10px;
 }
+/* Make sure the overlay stack can be tapped on iPad */
+.rightOverlay { pointer-events: none; }
+.rightOverlay .hud,
+.rightOverlay .latest { pointer-events: auto; }
+
+/* Buttons: make iOS treat taps as taps (not scroll/zoom gestures) */
+.hud__btn {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}

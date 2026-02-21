@@ -6,6 +6,9 @@ export function createMap(domId, { perfMode = true } = {}) {
     closePopupOnClick: false
   });
 
+  // right after const map = L.map(...)
+  window.__leafletMap = map;
+
   // Dark basemap (no key)
   L.tileLayer(
     "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
