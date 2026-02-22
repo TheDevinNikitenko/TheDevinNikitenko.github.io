@@ -2,7 +2,15 @@ import { el, qs } from "../utils/dom.js";
 import { fmtTime } from "../utils/time.js";
 import { severityBadgeClass } from "../map/alertsLayer.js";
 
-export function renderRightPanel(state, { onToggleRadar, onSetRadarIndex, onSetRadarOpacity, onRefresh, onSelectRecent }) {
+export function renderRightPanel(state, handlers) {
+   const {
+    onToggleRadar,
+    onRefresh,
+    onSetRadarIndex,
+    onSetRadarOpacity,
+    onSelectRecent
+  } = handlers;
+
   const root = qs("#rightPanel");
   root.innerHTML = "";
 
@@ -102,6 +110,27 @@ export function renderRightPanel(state, { onToggleRadar, onSetRadarIndex, onSetR
     )
   ]);
   
-  root.appendChild(controls);
-  root.appendChild(recent);
+  const toggleBtn = el("button", {
+  class: `btn ${state.ui.rightPanelOpen ? "" : "primary"}`,
+  type: "button",
+  onclick: () => {
+    state.ui.rightPanelOpen = !state.ui.rightPanelOpen;
+    renderRightPanel(state, handlers);
+  }
+}, [state.ui.rightPanelOpen ? "Hide Panel" : "Show Panel"]);
+
+  // ✅ apply collapsed styling depending on state
+  toggleBtn.classList.toggle(
+    "rightPanelCollapsedBtn",
+    !state.ui.rightPanelOpen
+  );
+
+  const wrap = qs("#rightPanel");
+wrap.innerHTML = "";
+wrap.appendChild(toggleBtn);
+
+if (state.ui.rightPanelOpen) {
+  wrap.appendChild(controls);
+  wrap.appendChild(recent);
+}
 }

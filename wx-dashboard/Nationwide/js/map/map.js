@@ -2,7 +2,9 @@ export function createMap() {
   const map = L.map("map", {
     zoomControl: true,
     preferCanvas: true,
-    worldCopyJump: true
+    worldCopyJump: true,
+    tap: true,              // ✅ helps iOS tap handling
+    touchZoom: true,
   }).setView([39.5, -98.35], 4);
 
   // Dark basemap (Carto Dark Matter)

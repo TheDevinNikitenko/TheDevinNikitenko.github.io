@@ -23,6 +23,7 @@ export const state = {
     search: "",
     filterKinds: new Set(["Warning","Watch","Advisory","Statement","Other"]),
     severity: "Any", // Any|Extreme|Severe|Moderate|Minor|Unknown
+    rightPanelOpen: true
   },
 
   // recently added
