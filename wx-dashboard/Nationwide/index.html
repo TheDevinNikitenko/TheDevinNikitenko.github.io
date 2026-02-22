@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>NWS Alerts Dashboard</title>
+
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+
+  <!-- Turf.js (point-in-polygon for inspect) -->
+  <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
+
+  <link rel="stylesheet" href="./css/app.css" />
+</head>
+
+<body>
+  <div class="app">
+    <header class="statusbar" id="statusbar">
+      <!-- Filled by status.js -->
+    </header>
+
+    <aside class="sidebar" id="sidebar">
+      <!-- Filled by sidebar.js -->
+    </aside>
+
+    <main class="mapWrap">
+      <div id="map" class="map"></div>
+
+      <!-- Right floating controls -->
+      <section class="rightPanel" id="rightPanel">
+        <!-- Filled by rightpanel.js -->
+      </section>
+
+      <!-- Inspect modal (overlapping alerts) -->
+      <div class="inspectSheet hidden" id="inspectSheet" role="dialog" aria-modal="true">
+        <div class="inspectHeader">
+          <div>
+            <div class="inspectTitle">Multiple alerts here</div>
+            <div class="inspectSubtitle" id="inspectSubtitle">Tap one to open its popup.</div>
+          </div>
+          <button class="btn ghost" id="inspectCloseBtn" type="button">Close</button>
+        </div>
+        <div class="inspectList" id="inspectList"></div>
+      </div>
+    </main>
+  </div>
+
+  <script type="module" src="./js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,598 @@
+/* css/app.css */
+
+:root{
+  --bg:#0b1220;
+  --panel: rgba(12,18,32,.92);
+  --panel2: rgba(16,25,45,.92);
+  --border: rgba(255,255,255,.10);
+  --text: rgba(255,255,255,.92);
+  --muted: rgba(255,255,255,.62);
+  --accent:#5dd6ff;
+
+  --ok:#45d483;
+  --warn:#ffcc66;
+  --bad:#ff6b6b;
+
+  --shadow: 0 10px 30px rgba(0,0,0,.35);
+  --radius: 16px;
+  --radiusSm: 12px;
+
+  --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+*{ box-sizing:border-box; }
+html,body{ height:100%; margin:0; background:var(--bg); color:var(--text); font-family:var(--sans); }
+
+.app{
+  height:100%;
+  display:grid;
+  grid-template-columns: 380px 1fr;
+  grid-template-rows: auto 1fr;
+  grid-template-areas:
+    "status status"
+    "sidebar map";
+}
+
+/* Status bar (top) */
+.statusbar{
+  grid-area:status;
+  display:flex;
+  gap:12px;
+  align-items:center;
+  padding:10px 12px;
+  background: linear-gradient(180deg, rgba(16,25,45,.98), rgba(12,18,32,.92));
+  border-bottom:1px solid var(--border);
+  position:sticky;
+  top:0;
+  z-index:50;
+}
+
+/* Sidebar (left) */
+.sidebar{
+  grid-area:sidebar;
+  border-right:1px solid var(--border);
+  background:var(--panel);
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  min-width: 320px;
+}
+
+.mapWrap{
+  grid-area:map;
+  position:relative;
+  overflow:hidden;
+}
+
+.map{
+  height:100%;
+  width:100%;
+}
+
+/* Sidebar status dot */
+.dot{
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.35);
+  box-shadow: 0 0 0 4px rgba(255,255,255,.06);
+}
+.dot.ok{ background: var(--ok); box-shadow: 0 0 0 4px rgba(69,212,131,.14); }
+
+/* Horizontal chip row like your screenshot */
+.chipRow{
+  display:flex;
+  gap:10px;
+  flex-wrap: wrap;
+}
+
+.chip{
+  appearance:none;
+  border: 1px solid rgba(93,214,255,.28);
+  background: rgba(93,214,255,.08);
+  color: rgba(255,255,255,.92);
+  border-radius: 999px;
+  padding: 10px 12px;
+  font-weight: 800;
+  font-size: 13px;
+  cursor:pointer;
+  user-select:none;
+}
+.chip:hover{ background: rgba(93,214,255,.12); }
+
+.chip.on{
+  border-color: rgba(93,214,255,.45);
+  background: rgba(93,214,255,.16);
+}
+
+/* Dark select (fixes the white dropdown look) */
+.selectDark{
+  width:100%;
+  padding:12px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(255,255,255,.06);
+  color: rgba(255,255,255,.92);
+  outline:none;
+  font-size: 15px;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.selectDark option{
+  background: rgba(12,18,32,.98);
+  color: rgba(255,255,255,.92);
+}
+
+/* 5 stat cards row (Extreme/Severe/Moderate/Minor/Unknown) */
+/* Severity counts row is now in header, not in scroll body */
+.statRow5Wrap{
+  width: 100%;
+  overflow: hidden; /* prevent pushing sidebar */
+}
+
+/* Make the 5 cards fit without forcing width */
+.statRow5{
+  display:grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr)); /* minmax(0,1fr) prevents overflow */
+  gap:8px;
+}
+
+/* Slightly smaller cards so they don't push */
+.stat5{
+  padding: 10px 8px;
+}
+
+/* If the sidebar is narrow (iPad portrait), wrap into 3+2 layout */
+@media (max-width: 420px){
+  .statRow5{
+    grid-template-columns: repeat(3, minmax(0,1fr));
+  }
+}
+.stat5 .k{ font-size:12px; color: rgba(255,255,255,.62); font-weight: 800; }
+.stat5 .v{ font-size:18px; font-weight: 900; margin-top:4px; }
+
+/* Shared UI */
+.card{
+  background:var(--panel2);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+}
+
+.hRow{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.hCol{ display:flex; flex-direction:column; gap:8px; }
+
+.btn{
+  appearance:none;
+  border:1px solid var(--border);
+  background: rgba(255,255,255,.06);
+  color:var(--text);
+  border-radius: 12px;
+  padding:10px 12px;
+  font-weight:600;
+  cursor:pointer;
+  touch-action: manipulation;
+}
+.btn:hover{ background: rgba(255,255,255,.10); }
+.btn:active{ transform: translateY(1px); }
+.btn.primary{ border-color: rgba(93,214,255,.35); background: rgba(93,214,255,.14); }
+.btn.ghost{ background: transparent; }
+
+.pill{
+  font-size:12px;
+  border:1px solid var(--border);
+  padding:6px 10px;
+  border-radius:999px;
+  color:var(--muted);
+  background: rgba(255,255,255,.04);
+}
+
+.input, select{
+  width:100%;
+  padding:12px 12px;
+  border-radius: 12px;
+  border:1px solid var(--border);
+  background: rgba(255,255,255,.06);
+  color: var(--text);
+  outline:none;
+  font-size: 15px; /* iPad friendly */
+}
+.input::placeholder{ color: rgba(255,255,255,.45); }
+
+.hr{ height:1px; background:var(--border); margin: 10px 0; }
+
+/* Sidebar sections */
+.sidebarHeader{
+  padding: 12px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  border-bottom:1px solid var(--border);
+}
+.sidebarBody{
+  padding: 12px;
+  overflow:auto;
+  -webkit-overflow-scrolling: touch;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.statGrid{
+  display:grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap:8px;
+}
+.stat{
+  border:1px solid var(--border);
+  background: rgba(255,255,255,.04);
+  border-radius: 14px;
+  padding:10px;
+}
+.stat .k{ font-size:12px; color:var(--muted); }
+.stat .v{ font-size:18px; font-weight:800; margin-top:4px; }
+
+.alertList{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  padding-bottom: 16px;
+}
+.alertItem{
+  border:1px solid var(--border);
+  background: rgba(255,255,255,.04);
+  border-radius: 14px;
+  padding:10px;
+  cursor:pointer;
+}
+.alertItem:hover{ background: rgba(255,255,255,.07); }
+.alertItem .top{ display:flex; align-items:flex-start; justify-content:space-between; gap:10px; }
+.alertItem .name{ font-weight:800; line-height:1.15; }
+.alertItem .meta{ font-size:12px; color:var(--muted); margin-top:6px; }
+.badge{
+  font-size:12px;
+  font-weight:800;
+  padding:6px 10px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  background: rgba(255,255,255,.06);
+  white-space:nowrap;
+}
+.badge.bad{ border-color: rgba(255,107,107,.35); background: rgba(255,107,107,.14); }
+.badge.warn{ border-color: rgba(255,204,102,.35); background: rgba(255,204,102,.14); }
+.badge.ok{ border-color: rgba(69,212,131,.35); background: rgba(69,212,131,.12); }
+
+/* Right floating panel (FIXED z-index so it stays ABOVE Leaflet overlays) */
+.rightPanel{
+  position:absolute;
+  right: 12px;
+  top: 12px;
+  width: 340px;
+  max-width: calc(100% - 24px);
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+
+  /* Leaflet tilePane ~200, overlayPane ~400, popupPane ~700
+     Put UI above overlays but below popups */
+  z-index: 650;
+
+  pointer-events: none; /* allow map interactions except panel */
+}
+.rightPanel > *{ pointer-events:auto; }
+
+.panelInner{ padding: 12px; }
+.panelTitle{ font-weight:900; font-size:14px; letter-spacing:.2px; color: rgba(255,255,255,.88); }
+.panelSub{ font-size:12px; color: var(--muted); margin-top:4px; }
+
+.row{ display:flex; gap:10px; align-items:center; }
+.row > *{ flex:1; }
+.small{ font-size:12px; color: var(--muted); }
+
+.slider{
+  width:100%;
+  accent-color: var(--accent);
+}
+
+.recentList{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  max-height: 220px;
+  overflow:auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom:6px;
+}
+
+/* Leaflet attribution */
+.leaflet-control-attribution{
+  background: rgba(0,0,0,.35) !important;
+  color: rgba(255,255,255,.65) !important;
+}
+
+/* --- Popup design (matches your previous project style) --- */
+
+/* ===== Popup style: matches your reference screenshot ===== */
+
+.leaflet-popup-content{
+  margin: 0 !important;
+  width: 340px;
+}
+
+.leaflet-popup-content-wrapper{
+  padding: 0 !important;
+  border-radius: 18px !important;
+  overflow: hidden;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.leaflet-popup-tip{
+  background: rgba(12,18,32,.96) !important;
+}
+
+.leaflet-popup-close-button{
+  display:none !important; /* we use our own X */
+}
+
+.wxpop{
+  position: relative;
+  display:flex;
+  flex-direction:column;
+  background: linear-gradient(180deg, rgba(20,28,45,.96), rgba(12,18,32,.96));
+  border: 1px solid rgba(255,255,255,.10);
+  color: rgba(255,255,255,.92);
+  box-shadow: 0 18px 50px rgba(0,0,0,.55);
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.wxpop, .wxpop *{
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: geometricPrecision;
+}
+
+/* X button */
+.wxpopX{
+  position:absolute;
+  top: 10px;
+  right: 10px;
+  width: 34px;
+  height: 34px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(255,255,255,.06);
+  color: rgba(255,255,255,.80);
+  font-size: 20px;
+  line-height: 1;
+  cursor:pointer;
+}
+.wxpopX:hover{ background: rgba(255,255,255,.10); color: rgba(255,255,255,.95); }
+
+.wxpopHead{
+  display:flex;
+  gap: 12px;
+  align-items:flex-start;
+  justify-content:space-between;
+  padding: 14px 52px 10px 14px; /* room for X */
+}
+
+.wxpopTitle{
+  font-weight: 900;
+  font-size: 15px;
+  line-height: 1.15;
+}
+
+.wxpopSev{
+  font-weight: 900;
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(255,255,255,.06);
+  white-space:nowrap;
+}
+.wxpopSev.sev{ border-color: rgba(255,107,107,.40); background: rgba(255,107,107,.16); }
+.wxpopSev.mod{ border-color: rgba(255,204,102,.40); background: rgba(255,204,102,.16); }
+.wxpopSev.min{ border-color: rgba(69,212,131,.40); background: rgba(69,212,131,.14); }
+.wxpopSev.unk{ border-color: rgba(255,255,255,.14); background: rgba(255,255,255,.06); }
+
+.wxpopMeta{
+  padding: 0 14px 10px;
+  font-size: 12px;
+  color: rgba(255,255,255,.70);
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+
+.wxrow{
+  display:flex;
+  gap:8px;
+}
+.wxk{
+  color: rgba(255,255,255,.55);
+  font-weight: 800;
+  min-width: 72px;
+}
+.wxv{
+  color: rgba(255,255,255,.85);
+  font-weight: 600;
+  overflow:hidden;
+  text-overflow: ellipsis;
+}
+
+.wxpopBody{
+  padding: 10px 14px 12px;
+  border-top: 1px solid rgba(255,255,255,.08);
+  max-height: 25vh;
+  overflow:auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.wxbody{
+  font-size: 13px;
+  line-height: 1.45;
+  color: rgba(255,255,255,.90);
+  white-space: pre-wrap;
+}
+
+.wxdivider{
+  height:1px;
+  background: rgba(255,255,255,.10);
+  margin: 12px 0;
+}
+
+.wxsecTitle{
+  font-weight: 900;
+  font-size: 12px;
+  color: rgba(255,255,255,.86);
+  margin-bottom: 6px;
+}
+
+/* bottom action bar */
+.wxpopActions{
+  padding: 12px 14px;
+  border-top: 1px solid rgba(255,255,255,.08);
+  display:flex;
+  gap:10px;
+}
+
+.wxbtn{
+  flex: 1 1 0;
+  text-align:center;
+  user-select:none;
+  text-decoration:none;
+  font-weight: 900;
+  font-size: 13px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(255,255,255,.06);
+  color: rgba(255,255,255,.92);
+}
+.wxbtn:hover{ background: rgba(255,255,255,.10); }
+
+.wxbtn.ghost{
+  flex: 1 1 0;
+  border-color: rgba(255,255,255,.10);
+  background: rgba(255,255,255,.04);
+  color: rgba(255,255,255,.78);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Inspect sheet (overlapping alerts) */
+.inspectSheet{
+  position:absolute;
+  left: 12px;
+  bottom: 12px;
+  width: min(520px, calc(100% - 24px));
+  max-height: 46%;
+  background: rgba(16,25,45,.96);
+  border:1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  z-index: 650; /* keep above Leaflet overlays */
+  overflow:hidden;
+}
+.inspectHeader{
+  padding: 12px;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:10px;
+}
+.inspectTitle{ font-weight: 900; }
+.inspectSubtitle{ font-size: 12px; color: var(--muted); margin-top:4px; }
+.inspectList{
+  overflow:auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 10px 12px 14px;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.hidden{ display:none; }
+
+/* Responsive */
+@media (max-width: 980px){
+  .app{
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto 1fr;
+    grid-template-areas:
+      "status"
+      "sidebar"
+      "map";
+  }
+  .sidebar{
+    min-width: unset;
+    max-height: 44vh;
+    border-right:none;
+    border-bottom:1px solid var(--border);
+  }
+  .rightPanel{ top: 10px; right: 10px; width: 320px; }
+}
+
+/* iPad / touch targets */
+@media (pointer: coarse){
+  .btn{ padding: 12px 14px; }
+  .alertItem{ padding: 12px; }
+}
+
+/* --- Visual style patch to match your screenshots (glass + deeper contrast) --- */
+.card{
+  background: linear-gradient(180deg, rgba(20,28,45,.92), rgba(12,18,32,.92));
+  border: 1px solid rgba(255,255,255,.08);
+  box-shadow: 0 14px 40px rgba(0,0,0,.48);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.sidebar{
+  background: linear-gradient(180deg, rgba(16,25,45,.94), rgba(12,18,32,.92));
+}
+
+.alertItem{
+  background: rgba(255,255,255,.035);
+  border: 1px solid rgba(255,255,255,.07);
+}
+.alertItem:hover{ background: rgba(255,255,255,.06); }
+
+.hr{ background: rgba(255,255,255,.08); }
+
+.pill{
+  background: rgba(255,255,255,.035);
+  border: 1px solid rgba(255,255,255,.08);
+}
+
+.input, select{
+  background: rgba(255,255,255,.045);
+  border: 1px solid rgba(255,255,255,.08);
+}
+
+/* Popup closer to your dark card style */
+.leaflet-popup-content-wrapper, .leaflet-popup-tip{
+  background: linear-gradient(180deg, rgba(20,28,45,.96), rgba(12,18,32,.96)) !important;
+  border: 1px solid rgba(255,255,255,.10);
+  box-shadow: 0 18px 50px rgba(0,0,0,.55);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.legend{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  font-size:12px;
+  color: rgba(255,255,255,.70);
+}
+.legItem{ display:flex; align-items:center; gap:6px; }
+.swatch{
+  width:10px; height:10px; border-radius:3px;
+  border:1px solid rgba(255,255,255,.18);
+}

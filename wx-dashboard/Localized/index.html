@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>WX Broadcast Dashboard</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Leaflet (map) -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand__logo" aria-hidden="true">WX</div>
+      <div class="brand__text">
+        <div class="brand__title">Broadcast Dashboard</div>
+        <div class="brand__sub" id="clock">—</div>
+      </div>
+    </div>
+
+    <div class="search">
+      <label class="sr-only" for="q">Search location</label>
+      <input id="q" class="search__input" inputmode="search" placeholder="Search city (e.g., Massapequa) or lat,lng" />
+      <button id="btnLocate" class="btn btn--ghost" title="Use device location">📍</button>
+      <button id="btnSearch" class="btn">Search</button>
+    </div>
+
+    <div class="toggles">
+      <button id="btnTalent" class="btn btn--ghost" aria-pressed="false">Talent Mode</button>
+      <button id="btnTheme" class="btn btn--ghost" aria-pressed="false">Dark</button>
+      <button id="btnFullscreen" class="btn btn--ghost">Fullscreen</button>
+    </div>
+  </header>
+
+  <main class="grid">
+    <!-- ALERT STRIP -->
+    <section class="panel panel--alerts" aria-label="Alerts">
+      <div class="alerts__left">
+        <span class="pill pill--live">LIVE</span>
+        <strong>HEADLINES</strong>
+      </div>
+      <div class="alerts__marquee" role="status" aria-live="polite">
+        <div id="alertsMarquee" class="marquee__track">
+          Loading alerts…
+        </div>
+      </div>
+      <div class="alerts__right">
+        <button id="btnClearAlerts" class="btn btn--tiny btn--ghost">Clear</button>
+      </div>
+    </section>
+
+    <!-- BIG CURRENT CONDITIONS -->
+    <section class="panel panel--current" aria-label="Current Conditions">
+      <div class="current__meta">
+        <div>
+          <div class="label">LOCATION</div>
+          <div class="h2" id="locName">—</div>
+          <div class="muted" id="locCoords">—</div>
+        </div>
+        <div class="badgeRow">
+          <span class="badge" id="badgeWx">—</span>
+          <span class="badge" id="badgeFeels">Feels —</span>
+          <span class="badge" id="badgeUpdated">Updated —</span>
+        </div>
+      </div>
+
+      <div class="current__hero">
+        <div class="tempBlock">
+          <div class="temp" id="tempNow">—°</div>
+          <div class="subRow">
+            <div class="kpi">
+              <div class="kpi__label">Wind</div>
+              <div class="kpi__value" id="windNow">—</div>
+            </div>
+            <div class="kpi">
+              <div class="kpi__label">Humidity</div>
+              <div class="kpi__value" id="humNow">—</div>
+            </div>
+            <div class="kpi">
+              <div class="kpi__label">Precip</div>
+              <div class="kpi__value" id="precNow">—</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="impact">
+          <div class="impact__title">Impact Index</div>
+          <div class="impact__bar">
+            <div id="impactFill" class="impact__fill"></div>
+          </div>
+          <div class="impact__desc" id="impactDesc">—</div>
+
+          <div class="ctaRow">
+            <button id="btnLowerThird" class="btn btn--wide">Generate Lower Third</button>
+            <button id="btnCopyLowerThird" class="btn btn--ghost btn--wide">Copy</button>
+          </div>
+
+          <div class="lowerThird" aria-label="Lower third preview">
+            <div class="lowerThird__title" id="ltTitle">WEATHER UPDATE</div>
+            <div class="lowerThird__line" id="ltLine">—</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HOURLY GRAPH -->
+    <section class="panel panel--hourly" aria-label="Hourly Forecast">
+      <div class="panel__head">
+        <div>
+          <div class="label">NEXT 24 HOURS</div>
+          <div class="panel__title">Temp / Precip / Wind</div>
+        </div>
+        <div class="panel__actions">
+          <button class="btn btn--tiny btn--ghost" id="btnUnits">°F / mph</button>
+          <button class="btn btn--tiny btn--ghost" id="btnRefresh">Refresh</button>
+        </div>
+      </div>
+      <div class="chartWrap">
+        <canvas id="hourlyChart" height="140"></canvas>
+      </div>
+      <div id="hourlyCards" class="hourlyCards" aria-label="Hourly cards"></div>
+    </section>
+
+    <!-- MAP / RADAR -->
+    <section class="panel panel--map" aria-label="Radar Map">
+      <div class="panel__head">
+        <div>
+          <div class="label">RADAR</div>
+          <div class="panel__title">Interactive Map (tap/drag)</div>
+        </div>
+        <div class="panel__actions">
+          <button class="btn btn--tiny btn--ghost" id="btnRadar">Radar</button>
+          <button class="btn btn--tiny btn--ghost" id="btnSatellite">Satellite</button>
+          <button class="btn btn--tiny btn--ghost" id="btnStorm">Storm Mode</button>
+        </div>
+      </div>
+      <div id="map" class="map"></div>
+
+      <div class="mapLegend">
+        <span class="legendDot legendDot--green"></span> Light
+        <span class="legendDot legendDot--yellow"></span> Moderate
+        <span class="legendDot legendDot--red"></span> Heavy
+        <span class="legendDot legendDot--purple"></span> Intense
+      </div>
+      <div class="precipScale" aria-label="Precip intensity scale">
+        <div class="precipScale__row">
+            <div class="precipScale__label">RAIN</div>
+            <div class="precipScale__bar precipScale__bar--rain"></div>
+            <div class="precipScale__ticks">
+                <span>Light</span><span>Mod</span><span>Heavy</span><span>Extreme</span>
+            </div>
+        </div>
+
+        <div class="precipScale__row">
+            <div class="precipScale__label">SNOW</div>
+            <div class="precipScale__bar precipScale__bar--snow"></div>
+            <div class="precipScale__ticks">
+              <span>Flurries</span><span>Steady</span><span>Heavy</span><span>Blinding</span>
+            </div>
+        </div>
+    </div>
+    </section>
+
+        <!-- ALERTS LIST -->
+<section class="panel panel--alertsList" aria-label="Alerts List">
+  <div class="panel__head">
+    <div>
+      <div class="label">ALERTS</div>
+      <div class="panel__title">Active Alerts (tap “View” for full data)</div>
+    </div>
+    <div class="panel__actions">
+      <button class="btn btn--tiny btn--ghost" id="btnExpandAlerts">Expand</button>
+    </div>
+  </div>
+
+  <div id="alertsList" class="alertsList">
+    <div class="muted" style="padding:12px 14px;">Loading…</div>
+  </div>
+</section>
+
+<!-- ALERT MODAL -->
+<div id="alertModal" class="modal" aria-hidden="true">
+  <div class="modal__backdrop" id="alertModalClose"></div>
+  <div class="modal__sheet" role="dialog" aria-modal="true" aria-label="Alert details">
+    <div class="modal__head">
+      <div>
+        <div class="modal__title" id="alertModalTitle">Alert</div>
+        <div class="muted" id="alertModalSub">—</div>
+      </div>
+      <div class="modal__actions">
+        <button class="btn btn--tiny btn--ghost" id="btnCopyAlertJson">Copy JSON</button>
+        <button class="btn btn--tiny btn--danger" id="btnCloseAlertModal">Close</button>
+      </div>
+    </div>
+
+    <div class="modal__body">
+      <div class="alertKeyGrid" id="alertKeyGrid"></div>
+      <pre class="jsonBox" id="alertJsonBox">{}</pre>
+    </div>
+  </div>
+</div>
+
+    <!-- 7 DAY -->
+    <section class="panel panel--daily" aria-label="7 Day Forecast">
+      <div class="panel__head">
+        <div>
+          <div class="label">EXTENDED</div>
+          <div class="panel__title">7-Day Outlook</div>
+        </div>
+        <div class="panel__actions">
+          <button class="btn btn--tiny btn--ghost" id="btnStory">Auto Story</button>
+        </div>
+      </div>
+      <div id="dailyList" class="dailyList"></div>
+      <div class="story" id="storyBox">
+        <div class="story__title">Producer Notes</div>
+        <div class="story__body" id="storyText">—</div>
+      </div>
+    </section>
+
+    <!-- SIDE KPIs -->
+    <section class="panel panel--kpis" aria-label="Broadcast KPIs">
+      <div class="panel__head">
+        <div>
+          <div class="label">BROADCAST</div>
+          <div class="panel__title">Key Metrics</div>
+        </div>
+      </div>
+
+      <div class="kpiGrid">
+        <div class="kpiCard">
+          <div class="kpiCard__label">Sunrise</div>
+          <div class="kpiCard__value" id="sunrise">—</div>
+        </div>
+        <div class="kpiCard">
+          <div class="kpiCard__label">Sunset</div>
+          <div class="kpiCard__value" id="sunset">—</div>
+        </div>
+        <div class="kpiCard">
+          <div class="kpiCard__label">UV</div>
+          <div class="kpiCard__value" id="uv">—</div>
+        </div>
+        <div class="kpiCard">
+          <div class="kpiCard__label">Visibility</div>
+          <div class="kpiCard__value" id="vis">—</div>
+        </div>
+        <div class="kpiCard">
+          <div class="kpiCard__label">Pressure</div>
+          <div class="kpiCard__value" id="pres">—</div>
+        </div>
+        <div class="kpiCard">
+          <div class="kpiCard__label">Clouds</div>
+          <div class="kpiCard__value" id="clouds">—</div>
+        </div>
+      </div>
+
+      <div class="panel__divider"></div>
+
+      <div class="producerTools">
+        <div class="label">PRODUCER TOOLS</div>
+        <button id="btnFreeze" class="btn btn--wide btn--ghost">Freeze Data (for segment)</button>
+        <button id="btnMock" class="btn btn--wide btn--ghost">Toggle Mock Data</button>
+        <button id="btnReset" class="btn btn--wide btn--danger">Reset Layout</button>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="muted">
+        Data: Open-Meteo + NWS Alerts. Radar: RainViewer tiles. (For broadcast: verify sources.)
+      </div>
+    </footer>
+  </main>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <!-- Leaflet -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <script src="app.js"></script>
+</body>
+</html>
