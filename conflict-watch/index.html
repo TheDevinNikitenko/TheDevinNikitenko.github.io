@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camera Monitoring System</title>
+    <link rel="stylesheet" href="./styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="./app.js" defer></script>
+</head>
+<body>
+  <!-- Top Bar -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="brand">
+        <div class="brand-title">Ops Dashboard</div>
+        <div class="brand-sub">Cameras • Alerts • Modules</div>
+      </div>
+    </div>
+
+    <div class="topbar-center world-clock">
+      <div class="time-block">
+        <div class="label">ZULU</div>
+        <div id="zulu-time" class="time">00:00:00Z</div>
+        <div class="timezone">UTC</div>
+      </div>
+      <div class="time-block">
+        <div class="label">ISRAEL</div>
+        <div id="israel-time" class="time">00:00:00</div>
+        <div class="timezone">IST (UTC+2/+3)</div>
+      </div>
+      <div class="time-block">
+        <div class="label">EASTERN</div>
+        <div id="est-time" class="time">00:00:00</div>
+        <div class="timezone">EST (UTC-5)</div>
+      </div>
+    </div>
+
+    <div class="topbar-right">
+      <button class="btn-primary" id="add-camera-btn">
+        <span class="material-icons">add</span> Add Camera
+      </button>
+    </div>
+  </header>
+
+  <!-- Page -->
+  <main class="dash">
+    <!-- LEFT: Modules -->
+    <aside class="sidebar">
+      <section class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Missile Alerts</div>
+          <div class="panel-sub">tzevaadom.co.il</div>
+        </div>
+
+        <div id="missileAlert" class="panel-body">
+          <iframe
+            title="Tzofar - Red Alert"
+            src="https://www.tzevaadom.co.il/en/"
+            loading="lazy"
+            referrerpolicy="strict-origin-when-cross-origin"
+          ></iframe>
+        </div>
+      </section>
+    </aside>
+
+    <!-- RIGHT: Cameras -->
+    <section class="main">
+      <div class="main-header">
+        <div>
+          <div class="main-title">Live Cameras</div>
+          <div class="main-sub">Click edit/delete on any feed</div>
+        </div>
+        <div class="camera-layout-control">
+            <label for="camsPerRow">Cameras:</label>
+            <select id="camsPerRow">
+                <option value="2">2</option>
+                <option value="3" selected>3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+            </select>
+        </div>
+      </div>
+
+      <div class="camera-grid" id="camera-grid">
+        <!-- populated by JS -->
+      </div>
+
+      <section class="panel">
+        <div class="panel-header">
+          <div class="panel-title">Notes</div>
+          <div class="panel-sub">Quick scratchpad</div>
+        </div>
+        <div class="panel-body panel-pad">
+          <div class="muted">
+            Drop more modules here (news, incident feed, audio log, etc.)
+          </div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <!-- Add/Edit Camera Modal (unchanged) -->
+  <div id="camera-modal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2 id="modal-title">Add Camera</h2>
+      <form id="camera-form">
+        <input type="hidden" id="camera-id" />
+        <div class="form-group">
+          <label for="camera-title">Camera Title:</label>
+          <input type="text" id="camera-title" placeholder="e.g., Israel Skyline" required />
+        </div>
+        <div class="form-group">
+          <label for="camera-location">Location:</label>
+          <input type="text" id="camera-location" placeholder="e.g., Tel Aviv, Israel" required />
+        </div>
+        <div class="form-group">
+          <label for="camera-type">Stream Type:</label>
+          <select id="camera-type" required>
+            <option value="youtube">YouTube</option>
+            <option value="hls">HLS (.m3u8)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="camera-url">Stream URL:</label>
+          <input type="text" id="camera-url" placeholder="Enter stream URL" required />
+          <small class="form-hint">For YouTube: paste watch URL or embed URL</small>
+        </div>
+        <div class="form-actions">
+          <button type="button" class="btn-secondary" id="cancel-btn">Cancel</button>
+          <button type="submit" class="btn-primary">Save Camera</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</body>
+</html>
