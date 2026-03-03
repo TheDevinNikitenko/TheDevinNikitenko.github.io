@@ -407,6 +407,17 @@ button:active{ transform: translateY(1px); }
   margin-top: 12px;
 }
 
+.drag-handle { cursor: grab; }
+.drag-handle:active { cursor: grabbing; }
+
+.drag-ghost {
+  opacity: 0.35;
+}
+
+.drag-chosen {
+  outline: 2px solid rgba(74,163,255,0.35);
+}
+
 /* Responsive */
 @media (max-width: 1100px){
   .topbar{ grid-template-columns: 1fr; }
