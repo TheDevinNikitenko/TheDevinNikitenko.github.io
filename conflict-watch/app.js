@@ -30,7 +30,7 @@ function toYouTubeEmbedUrl(inputUrl) {
   if (url.hostname === "youtu.be") {
     const id = url.pathname.replace("/", "");
     if (!id) return null;
-    const embed = new URL(`https://www.youtube-nocookie.com/embed/${id}`);
+    const embed = new URL(`https://www.youtube.com/embed/${id}`);
     embed.searchParams.set("autoplay", "1");
     embed.searchParams.set("mute", "1");
     embed.searchParams.set("playsinline", "1");
@@ -41,7 +41,7 @@ function toYouTubeEmbedUrl(inputUrl) {
   if (url.hostname.includes("youtube.com")) {
     const id = url.searchParams.get("v");
     if (!id) return null;
-    const embed = new URL(`https://www.youtube-nocookie.com/embed/${id}`);
+    const embed = new URL(`https://www.youtube.com/embed/${id}`);
     embed.searchParams.set("autoplay", "1");
     embed.searchParams.set("mute", "1");
     embed.searchParams.set("playsinline", "1");
@@ -528,4 +528,5 @@ document.addEventListener("DOMContentLoaded", async () => {
     console.error("Application initialization failed:", err);
     alert("Failed to initialize the application. Check console for details.");
   }
+
 });
