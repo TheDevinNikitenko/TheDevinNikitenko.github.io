@@ -70,15 +70,10 @@
     border-left: 3px solid #4aa3ff;
 }
 
-@keyframes glow {
-    from { text-shadow: 0 0 5px rgba(74, 163, 255, 0.5); }
-    to { text-shadow: 0 0 15px rgba(74, 163, 255, 0.8); }
-}
-
 .artist-name {
     flex-grow: 1;
     white-space: normal; /* Allow text wrapping */
-    word-break: break-word; /* Break long words */
+    word-break: break-all; /* Break long words */
     margin-bottom: 4px;
 }
 
@@ -87,6 +82,33 @@
     font-family: monospace;
     font-size: 0.85rem;
     white-space: nowrap; /* Keep time on one line */
+}
+
+.day-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.day-tab {
+  padding: 8px 14px;
+  border: none;
+  background: rgba(255,255,255,0.04);
+  color: #aaa;
+  cursor: pointer;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+.day-tab.active {
+  background: #fff;
+  color: #000;
+}
+
+@keyframes glow {
+    from { text-shadow: 0 0 5px rgba(74, 163, 255, 0.5); }
+    to { text-shadow: 0 0 15px rgba(74, 163, 255, 0.8); }
 }
 
 /* Responsive adjustments */
