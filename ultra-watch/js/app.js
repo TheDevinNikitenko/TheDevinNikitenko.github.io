@@ -574,27 +574,63 @@ document.addEventListener("DOMContentLoaded", async () => {
     };
 
     // ---------- Cameras per row control ----------
-    const initCamsPerRowControl = () => {
-      if (!camsPerRowSelect) return;
 
-      const apply = (value) => {
-        document.documentElement.style.setProperty("--cams-per-row", String(value));
-      };
+const initCamsPerRowControl = () => {
+  if (!camsPerRowSelect) return;
 
-      const saved = localStorage.getItem("camsPerRow");
-      if (saved) {
-        camsPerRowSelect.value = saved;
-        apply(saved);
-      } else {
-        apply(camsPerRowSelect.value || 3);
-      }
+  const apply = (value) => {
+    document.documentElement.style.setProperty("--cams-per-row", String(value));
+    cameraGrid.classList.remove("featured");
+    document.documentElement.style.setProperty("--featured-mode", 0);
+  };
 
-      camsPerRowSelect.addEventListener("change", (e) => {
-        const value = e.target.value;
-        apply(value);
-        localStorage.setItem("camsPerRow", value);
-      });
-    };
+  const saved = localStorage.getItem("camsPerRow");
+  if (saved) {
+    camsPerRowSelect.value = saved;
+    apply(saved);
+  } else {
+    apply(camsPerRowSelect.value || 3);
+  }
+
+  camsPerRowSelect.addEventListener("change", (e) => {
+    const value = e.target.value;
+    apply(value);
+    localStorage.setItem("camsPerRow", value);
+  });
+};
+
+// Layout buttons
+const initLayoutButtons = () => {
+  const featuredBtn = document.getElementById("layout-featured");
+  const col2Btn = document.getElementById("layout-2col");
+  const col3Btn = document.getElementById("layout-3col");
+  const col4Btn = document.getElementById("layout-4col");
+
+  featuredBtn.addEventListener("click", () => {
+    cameraGrid.classList.add("featured");
+    document.documentElement.style.setProperty("--featured-mode", 1);
+    document.documentElement.style.setProperty("--cams-per-row", 2);
+  });
+
+  col2Btn.addEventListener("click", () => {
+    cameraGrid.classList.remove("featured");
+    document.documentElement.style.setProperty("--cams-per-row", 2);
+  });
+
+  col3Btn.addEventListener("click", () => {
+    cameraGrid.classList.remove("featured");
+    document.documentElement.style.setProperty("--cams-per-row", 3);
+  });
+
+  col4Btn.addEventListener("click", () => {
+    cameraGrid.classList.remove("featured");
+    document.documentElement.style.setProperty("--cams-per-row", 4);
+  });
+};
+
+// Initialize
+initCamsPerRowControl();
+initLayoutButtons();
 
     // ---------- SortableJS reorder + persist ----------
     const initSortable = () => {

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Camera Monitoring System</title>
-    <link rel="stylesheet" href="./styles.css">
+    <link rel="stylesheet" href="./styles2.css">
     <link rel="stylesheet" href="./stage-tracker.css">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -98,24 +98,36 @@
       <!-- Cameras -->
       <div class="main-header">
         <div>
-          <div class="main-title">Live Cameras</div>
-          <div class="main-sub">Click edit/delete on any feed</div>
-        </div>
-        <div class="camera-layout-control">
-            <label for="camsPerRow">Cameras:</label>
-            <select id="camsPerRow">
-                <option value="1">1</option>
-                <option value="2"selected>2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-                <option value="6">6</option>
-            </select>
-        </div>
+        <div class="main-title">Live Cameras</div>
+        <div class="main-sub">Click edit/delete on any feed</div>
       </div>
-      <div class="camera-grid" id="camera-grid">
-        <!-- populated by JS -->
+      <div class="camera-layout-control">
+        <button id="layout-featured" class="layoutSettingsBtn">
+          <span class="material-icons">featured_video</span> Featured Camera
+        </button>
+        <button id="layout-2col" class="layoutSettingsBtn">
+          <span class="material-icons">add_box</span> 2 Columns
+        </button>
+        <button id="layout-3col" class="layoutSettingsBtn">
+          <span class="material-icons">grid_3x3</span> 3 Columns
+        </button>
+        <button id="layout-4col" class="layoutSettingsBtn">
+          <span class="material-icons">grid_4x4</span> 4 Columns
+        </button>
+
+        <label for="camsPerRow">Cameras:</label>
+        <select id="camsPerRow">
+          <option value="1">1</option>
+          <option value="2" selected>2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+        </select>
       </div>
+    </div>
+
+    <div class="camera-grid" id="camera-grid">
+      <!-- populated by JS -->
+    </div>
 
       <!-- Stage Tracker -->
       <div class="stage-tracker" id="stage-tracker">
