@@ -609,7 +609,7 @@ const initLayoutButtons = () => {
   featuredBtn.addEventListener("click", () => {
     cameraGrid.classList.add("featured");
     document.documentElement.style.setProperty("--featured-mode", 1);
-    document.documentElement.style.setProperty("--cams-per-row", 2);
+    
   });
 
   col2Btn.addEventListener("click", () => {

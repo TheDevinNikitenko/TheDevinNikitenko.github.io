@@ -338,8 +338,8 @@ button:active{ transform: translateY(1px); }
 }
 
 .camera-grid.featured .camera-card:first-child {
-  grid-column: span 2;
-  grid-row: span 2;
+  grid-column: span var(--cams-per-row);
+  grid-row: span var(--cams-per-row)2;
 }
 
 /* Camera card */
