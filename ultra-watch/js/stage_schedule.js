@@ -54,6 +54,24 @@ export const schedule = {
   },
 
   "2026-03-28": {
+    "Ultra Live": [
+      { name: "Mykris", start: "13:15", end: "15:25", stage: "Mainstage" },
+      { name: "Nicky Romero", start: "15:25", end: "16:05", stage: "Mainstage" },
+      { name: "Armnhmr", start: "16:05", end: "16:10", stage: "Worldwide" },
+      { name: "Loud Luxury", start: "16:10", end: "17:10", stage: "Mainstage" },
+      { name: "Confidence Man", start: "17:10", end: "17:25", stage: "Live Stage" },
+      { name: "Alan Walker", start: "17:25", end: "18:00", stage: "Mainstage" },
+      { name: "Eli Brown", start: "18:00", end: "18:10", stage: "MegaStructure" },
+      { name: "Bou", start: "18:10", end: "18:15", stage: "Worldwide" },
+      { name: "Steve Aoki", start: "18:15", end: "19:15", stage: "Mainstage" },
+      { name: "Adam Beyer B2B Joseph Capriati", start: "19:15", end: "19:25", stage: "MegaStructure" },
+      { name: "Excision", start: "19:25", end: "20:05", stage: "Mainstage" },
+      { name: "Snow Strippers", start: "20:05", end: "20:25", stage: "Live Stage" },
+      { name: "Hardwell", start: "20:25", end: "21:30", stage: "Mainstage" },
+      { name: "Armin Van Buuren", start: "21:30", end: "22:30", stage: "Mainstage" },
+      { name: "Carl Cox", start: "22:30", end: "22:40", stage: "MegaStructure" },
+      { name: "Swedish House Mafia", start: "22:40", end: "23:59", stage: "Mainstage" },
+    ],
     "Mainstage": [
       { name: "Gil Glaze", start: "12:00", end: "12:55" },
       { name: "Myrkris", start: "12:55", end: "14:00" },
