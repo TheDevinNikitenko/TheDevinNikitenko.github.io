@@ -1,4 +1,4 @@
-// app.js
+import { schedule } from './stage_schedule.js';
 
 // ---------- Supabase ----------
 const initializeSupabase = () => {
@@ -95,6 +95,12 @@ function startWorldClock() {
   setInterval(updateTimes, 1000);
 }
 
+let countdownState = false
+let leakState = false
+
+const today = new Date().toISOString().split('T')[0]; 
+const todaysSchedule = schedule[today];
+ 
 // ---------- Main ----------
 document.addEventListener("DOMContentLoaded", async () => {
   // Start clocks regardless of app init success
@@ -121,8 +127,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     const modalTitle = document.getElementById("modal-title");
     const cancelBtn = document.getElementById("cancel-btn");
 
-    // Optional: layout selector (cameras per row)
     const camsPerRowSelect = document.getElementById("camsPerRow");
+
+    const countdownToggle = document.getElementById("toggleCountdown");
+    const leaksToggle = document.getElementById("toggleLeaks");
 
     // Form fields
     const cameraIdField = document.getElementById("camera-id");
@@ -130,6 +138,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const cameraLocationField = document.getElementById("camera-location");
     const cameraTypeField = document.getElementById("camera-type");
     const cameraUrlField = document.getElementById("camera-url");
+    const cameraScheduleLinkField = document.getElementById("schedule-link");
 
     // HLS instances for cleanup
     const hlsInstances = {};
@@ -157,6 +166,64 @@ document.addEventListener("DOMContentLoaded", async () => {
         alert("Failed to load cameras. Check console for details.");
       }
     };
+
+    const getUltraScheduleInfo = (allSchedules, stageName) => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  const todayStr = `${year}-${month}-${day}`;
+  const currentTimeInt = now.getHours() * 100 + now.getMinutes();
+
+  const daySchedule = allSchedules[todayStr];
+  if (!daySchedule || !daySchedule[stageName]) {
+    return { current: "OFF AIR", next: "TBD", nextStart: null };
+  }
+
+  const stageSlots = daySchedule[stageName];
+  let currentArtist = "OFF AIR";
+  let nextArtist = "TBD";
+  let nextStart = null;
+
+  for (let i = 0; i < stageSlots.length; i++) {
+    const slot = stageSlots[i];
+    const startInt = parseInt(slot.start.replace(":", ""));
+    const endInt = parseInt(slot.end.replace(":", ""));
+
+    if (currentTimeInt >= startInt && currentTimeInt < endInt) {
+      currentArtist = slot.name;
+      if (stageSlots[i + 1]) {
+        nextArtist = stageSlots[i + 1].name;
+        nextStart = stageSlots[i + 1].start; // Store "19:00"
+      }
+      break;
+    } else if (currentTimeInt < startInt) {
+      currentArtist = "STARTING SOON";
+      nextArtist = slot.name;
+      nextStart = slot.start;
+      break;
+    }
+  }
+
+  return { current: currentArtist, next: nextArtist, nextStart };
+};
+const getCountdown = (startTimeStr) => {
+  if (!startTimeStr) return "";
+  
+  const now = new Date();
+  const [hours, minutes] = startTimeStr.split(":").map(Number);
+  
+  const target = new Date();
+  target.setHours(hours, minutes, 0, 0);
+
+  const diff = target - now;
+  if (diff <= 0) return "Starting Now!";
+
+  const mins = Math.floor(diff / 1000 / 60);
+  const secs = Math.floor((diff / 1000) % 60);
+
+  return `(${mins}m ${secs}s)`;
+};
 
     // ---------- Card creation ----------
     const addCameraToGrid = (camera) => {
@@ -229,16 +296,62 @@ document.addEventListener("DOMContentLoaded", async () => {
       const cameraInfo = document.createElement("div");
       cameraInfo.className = "camera-info";
 
-      const cameraLocation = document.createElement("div");
-      cameraLocation.className = "camera-location";
-      cameraLocation.textContent = camera.location || "";
+      const schedInfo = getUltraScheduleInfo(schedule, camera.schedule);
+
+      const currentlyPlayingDiv = document.createElement("div");
+      currentlyPlayingDiv.className = "currently-playing-div";
+      const currentlyPlayingSpan = document.createElement("span");
+      currentlyPlayingSpan.className = "currently-playing-text";
+      currentlyPlayingSpan.innerHTML = "Currently Playing: ";
+      currentlyPlayingDiv.appendChild(currentlyPlayingSpan);
+      const currentlyPlaying = document.createElement("span");
+      currentlyPlaying.className = "currently-playing";
+      currentlyPlaying.textContent = schedInfo.current;
+      currentlyPlayingDiv.appendChild(currentlyPlaying);
+
+      const upNextDiv = document.createElement("div");
+      upNextDiv.className = "up-next-div";
+      const upNextSpan = document.createElement("span");
+      upNextSpan.className = "up-next-text";
+      upNextSpan.innerHTML = "Up Next: ";
+      upNextDiv.appendChild(upNextSpan);
+      const upNext = document.createElement("span");
+      upNext.className = "up-next";
+      upNext.textContent = schedInfo.next;
+      upNextDiv.appendChild(upNext);
+
+      // Create timer element for up next
+      const countdownSpan = document.createElement("span");
+      countdownSpan.className = "up-next-countdown";
+
+      upNextDiv.appendChild(countdownSpan);
+
+      // Start the live update loop
+      const updateUI = () => {
+        const data = getUltraScheduleInfo(schedule, camera.schedule);
+        currentlyPlaying.textContent = data.current;
+        upNext.textContent = data.next;
+  
+        // Only show countdown if there is a next artist and they haven't started
+        if (data.nextStart) {
+          countdownSpan.textContent = getCountdown(data.nextStart);
+        } else {
+          countdownSpan.textContent = "";
+        }
+      };
+
+      // Run every second for a smooth countdown
+      const timerInterval = setInterval(updateUI, 1000);
+      updateUI(); // Run once immediately
 
       const cameraSource = document.createElement("div");
       cameraSource.className = "camera-source";
       cameraSource.textContent = camera.type === "youtube" ? "YouTube" : "HLS";
+      
+      // SCHEDULE LINK ADD NEXT AND CURRENT HERE
 
-      cameraInfo.appendChild(cameraLocation);
-      cameraInfo.appendChild(cameraSource);
+      cameraInfo.appendChild(currentlyPlayingDiv);
+      cameraInfo.appendChild(upNextDiv);
 
       cameraCard.appendChild(cameraHeader);
       cameraCard.appendChild(cameraPlayer);
@@ -341,6 +454,29 @@ document.addEventListener("DOMContentLoaded", async () => {
         setBadge(camera.id, "offline");
       }
     };
+    // Toggle btn's
+    const Togglecountdown = () => {
+      if (countdownState === false ){
+        document.getElementById("mainCountdown").classList.remove('hidden');
+        countdownState = true;
+      } else {
+        document.getElementById("mainCountdown").classList.add('hidden');
+        countdownState = false;
+      }
+    }
+    const Toggleleaks = () => {
+      if (leakState === false ){
+        document.getElementById("leaksPanel").classList.remove('hidden');
+        leakState = true;
+      } else {
+        document.getElementById("leaksPanel").classList.add('hidden');
+        leakState = false;
+      }
+    }
+
+    countdownToggle?.addEventListener("click", () => Togglecountdown());
+    leaksToggle?.addEventListener("click", () => Toggleleaks());
+
 
     // ---------- Modal ----------
     const openModal = (camera = null) => {
@@ -351,6 +487,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         cameraLocationField.value = camera.location || "";
         cameraTypeField.value = camera.type || "youtube";
         cameraUrlField.value = camera.url || "";
+        cameraScheduleLinkField.value = camera.schedule || "";
+
       } else {
         modalTitle.textContent = "Add Camera";
         cameraForm.reset();
@@ -484,6 +622,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         location: cameraLocationField.value.trim(),
         type: cameraTypeField.value,
         url: cameraUrlField.value.trim(),
+        schedule: cameraScheduleLinkField.value,
       };
 
       if (cameraIdField.value) {

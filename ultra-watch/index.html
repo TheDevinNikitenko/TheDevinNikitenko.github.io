@@ -11,7 +11,7 @@
     <!-- Material Icons -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
-    <script src="./js/app.js" defer></script>
+    <script type="module" src="./js/app.js" defer></script>
 </head>
 <body>
   <!-- Top Bar -->
@@ -51,9 +51,7 @@
   <section class="modules-top">
     <!-- weather -->
     <section class="panel weather-body">
-      <div class="panel-body">
-        <div id="ww_44d31dfd537f9" v='1.3' loc='id' a='{"t":"responsive","lang":"en","sl_lpl":1,"ids":["wl4471"],"font":"Arial","sl_ics":"one_a","sl_sot":"fahrenheit","cl_bkg":"#1976D2","cl_font":"#FFFFFF","cl_cloud":"#FFFFFF","cl_persp":"#FFFFFF","cl_sun":"#FFC107","cl_moon":"#FFC107","cl_thund":"#FF5722","cl_odd":"#0000000a","sl_tof":"7"}'>More forecasts: <a href="https://oneweather.org/new_york_city/30_days/" id="ww_44d31dfd537f9_u" target="_blank">NYC weather forecast 30 days</a></div><script async src="https://app3.weatherwidget.org/js/?id=ww_44d31dfd537f9"></script>
-      </div>
+      <div id="ww_58ecaedcf4c3a" v='1.3' loc='id' a='{"t":"responsive","lang":"en","sl_lpl":1,"ids":["wl4471"],"font":"Arial","sl_ics":"one_a","sl_sot":"fahrenheit","cl_bkg":"rgba(255,255,255,0)","cl_font":"#FFFFFF","cl_cloud":"#FFFFFF","cl_persp":"#81D4FA","cl_sun":"#FFC107","cl_moon":"#FFC107","cl_thund":"#FF5722","cl_odd":"rgba(255,255,255,0.058823529411764705)"}'>More forecasts: <a href="https://oneweather.org/new_york_city/30_days/" id="ww_58ecaedcf4c3a_u" target="_blank">NYC weather forecast 30 days</a></div><script async src="https://app3.weatherwidget.org/js/?id=ww_58ecaedcf4c3a"></script>
     </section>
   </section>
 
@@ -61,7 +59,15 @@
   <section class="dash-main">
     <!-- LEFT SIDEBAR -->
     <aside class="sidebar-left">
-      <div class="main-countdown">
+      <div class="left-side-panel-controls">
+        <button id="toggleCountdown" class="left-side-panel-btn">
+          Toggle Countdown
+        </button>
+        <button id="toggleLeaks" class="left-side-panel-btn">
+          Toggle Leaks
+        </button>
+      </div>
+      <div class="main-countdown" id="mainCountdown">
           <div id="countdown-title" class="countdown-label">COUNTDOWN TO ULTRA MIAMI 2026</div>
           <div id="countdownTime" class="countdown-time">
             <div class="countdown-comp">
@@ -85,7 +91,7 @@
             </div>
           </div>
         </div>
-      <section class="panel">
+      <section class="panel" id="leaksPanel">
         <div class="panel-header">
           <h2 class="panel-title">Leak(s)</h2>
         </div>
@@ -174,6 +180,17 @@
           <input type="text" id="camera-url" placeholder="Enter stream URL" required />
           <small class="form-hint">For YouTube: paste watch URL or embed URL</small>
         </div>
+        <div class="form-group">
+          <label for="schedule-link">Link to schedule:</label>
+          <select id="schedule-link" required>
+            <option value="Ultra Live">Ultra Live</option>
+            <option value="Mainstage">Mainstage</option>
+            <option value="Worldwide">Worldwide</option>
+            <option value="Megastructure">Megastructure</option>
+            <option value="Cove">Cove</option>
+            <option value="Live Stage">Live Stage</option>
+          </select>
+        </div>
         <div class="form-actions">
           <button type="button" class="btn-secondary" id="cancel-btn">Cancel</button>
           <button type="submit" class="btn-primary">Save Camera</button>
@@ -232,7 +249,7 @@
       </form>
     </div>
   </div>
-  <script src="./js/schedule.js"></script>
+  <script type="module" src="./js/schedule.js"></script>
   <script type="module" src="./js/leakList.js"></script>
   <script type="module" src="./js/countdown.js"></script>
 </body>

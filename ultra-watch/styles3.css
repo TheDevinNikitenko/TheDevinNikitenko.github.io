@@ -1,12 +1,12 @@
 :root{
-  --bg: #0b0f17;
-  --surface: rgba(255,255,255,0.06);
+  --bg: #10131b;                 /* Dark blue-black base */
+  --surface: rgba(255,255,255,0.05);
   --surface-2: rgba(255,255,255,0.08);
-  --border: rgba(255,255,255,0.10);
-  --text: rgba(255,255,255,0.92);
-  --muted: rgba(255,255,255,0.62);
-  --accent: #4aa3ff;
-  --danger: #ff4d4d;
+  --border: rgba(255,255,255,0.12);
+  --text: rgba(255,255,255,0.90);
+  --muted: rgba(255,255,255,0.55);
+  --accent: #3ec6ff;              /* Cool cyan highlights */
+  --danger: #ff5a5a;              /* Subtle red alerts */
   --shadow: 0 10px 30px rgba(0,0,0,0.35);
 
   --r: 14px;
@@ -23,10 +23,6 @@ body{
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
   color: var(--text);
   background: var(--bg);
-}
-
-.hidden{
-  display: none;
 }
 
 /* Dropdown options */
@@ -169,7 +165,7 @@ padding: 8px;
 .sidebar-right{
   display:flex;
   flex-direction:column;
-  gap:10px;
+  gap:20px;
 }
 .panel{
   border: 1px solid var(--border);
@@ -209,8 +205,7 @@ padding: 8px;
 .muted{ color: var(--muted); font-size: 13px; }
 
 .weather-body {
-  max-height: 100px;
-  border-radius: 0px;
+  max-height: 160px;
 }
 
 /* Make missileAlert smaller and contained */
@@ -312,27 +307,6 @@ button:active{ transform: translateY(1px); }
   border-color: rgba(74,163,255,0.55);
 }
 
-.left-side-panel-controls{
-  display: flex;
-  align-items: center;
-  grid-area: 8px;
-  background-color: var(--surface);
-}
-
-.left-side-panel-btn{
-  background: rgba(255,255,255,0.08);
-  color: var(--text);
-  border-color: rgba(255,255,255,0.10);
-  padding: 5px 10px;
-  border-radius: 0px;
-  width: 50%;
-  min-height: 35px;
-}
-.left-side-panel-btn:hover{
-  background: rgba(74,163,255,0.24);
-  border-color: rgba(74,163,255,0.55);
-}
-
 /* Camera grid controls */
 .camera-layout-control{
   display: flex;
@@ -424,6 +398,16 @@ button:active{ transform: translateY(1px); }
   border: 0;
 }
 
+.camera-info{
+  padding: 10px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--border);
+  background: rgba(255,255,255,0.02);
+  height: auto;
+}
+
 .camera-location{
   font-size: 12px;
   color: var(--muted);
@@ -441,79 +425,6 @@ button:active{ transform: translateY(1px); }
   color: var(--muted);
   text-transform: uppercase;
   letter-spacing: 0.08em;
-}
-.camera-info{
-  padding: 10px 12px;
-  /*display: flex;
-  justify-content: space-between;
-  align-items: center;*/
-  border-top: 1px solid var(--border);
-  background: rgba(255,255,255,0.02);
-  height: auto;
-}
-
-
-.currently-playing-div{
-  display: flex;
-  align-items: center;
-}
-.currently-playing-text{
-  font-size: 12px;
-  color: var(--muted);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding-right: 5px;
-  min-width: 115px;
-}
-.currently-playing-text::before{
-  content: "▶";
-  color: rgba(17, 243, 100, 0.9);
-  font-weight: 900;
-}
-.currently-playing{
-  font-size: 11px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  color: var(--accent);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-.up-next-div{
-  display: flex;
-  align-items: center;
-}
-.up-next-text{
-  font-size: 12px;
-  color: var(--muted);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding-right: 5px;
-  min-width: 68px;
-}
-.up-next-text::before{
-  content: "⏭";
-  color: rgba(74,163,255,0.9);
-  font-weight: 900;
-}
-.up-next{
-  font-size: 11px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  color: var(--text);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-.up-next-countdown{
-  font-size: 11px;
-  margin-left: 10px;
-  color: var(--danger);
-  flex-shrink: 0;       /* Prevents the ellipsis from affecting this element */
-  white-space: nowrap;  /* Ensures the time stays on one line */
-  font-family: monospace; /* Keeps numbers from jumping */
 }
 
 /* Leak List */
