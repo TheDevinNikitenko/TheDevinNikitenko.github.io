@@ -714,30 +714,6 @@ const getCountdown = (startTimeStr) => {
 
     // ---------- Cameras per row control ----------
 
-const initCamsPerRowControl = () => {
-  if (!camsPerRowSelect) return;
-
-  const apply = (value) => {
-    document.documentElement.style.setProperty("--cams-per-row", String(value));
-    cameraGrid.classList.remove("featured");
-    document.documentElement.style.setProperty("--featured-mode", 0);
-  };
-
-  const saved = localStorage.getItem("camsPerRow");
-  if (saved) {
-    camsPerRowSelect.value = saved;
-    apply(saved);
-  } else {
-    apply(camsPerRowSelect.value || 3);
-  }
-
-  camsPerRowSelect.addEventListener("change", (e) => {
-    const value = e.target.value;
-    apply(value);
-    localStorage.setItem("camsPerRow", value);
-  });
-};
-
 // Layout buttons
 const initLayoutButtons = () => {
   const featuredBtn = document.getElementById("layout-featured");
@@ -768,7 +744,6 @@ const initLayoutButtons = () => {
 };
 
 // Initialize
-initCamsPerRowControl();
 initLayoutButtons();
 
     // ---------- SortableJS reorder + persist ----------
@@ -819,7 +794,6 @@ initLayoutButtons();
     leakClose?.addEventListener("click", () => closeLeakWindow());
 
     // ---------- Init ----------
-    initCamsPerRowControl();
     await loadCameras();
     initSortable();
   } catch (err) {
