@@ -129,6 +129,19 @@ export const schedule = {
   },
 
   "2026-03-29": {
+    "Ultra Live": [
+      { name: "Opening Show", start: "14:45", end: "15:00", stage: ""},
+      { name: "Kapuchon", start: "15:00", end: "15:15", stage: "Mainstage | REPLAY"},
+      { name: "Maddix", start: "15:15", end: "16:00", stage: "Mainstage"},
+      { name: "Andy C", start: "16:00", end: "16:20", stage: "Worldwide" },
+      { name: "Artbat", start: "16:20", end: "17:05", stage: "Mainstage" },
+      { name: "Parisi", start: "17:05", end: "17:25", stage: "Live Stage" },
+      { name: "Marlon Hoffstadt", start: "17:25", end: "18:30", stage: "Mainstage" },
+      { name: "Afrojack", start: "18:30", end: "19:35", stage: "Mainstage" },
+      { name: "DJ Snake", start: "19:35", end: "20:35", stage: "Mainstage" },
+      { name: "Amelie Lens B2B Sara landry [WORLD DEBUT]", start: "20:35", end: "20:45", stage: "Megastructure" },
+      { name: "John Summit", start: "20:45", end: "22:00", stage: "Mainstage" },
+    ],
     "Mainstage": [
       { name: "Kapuchon", start: "12:15", end: "13:05" },
       { name: "Me N U", start: "13:05", end: "14:10" },

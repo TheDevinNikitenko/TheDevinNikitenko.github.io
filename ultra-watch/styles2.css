@@ -444,12 +444,12 @@ button:active{ transform: translateY(1px); }
 }
 .camera-info{
   padding: 10px 12px;
-  /*display: flex;
+  display: flex;
   justify-content: space-between;
-  align-items: center;*/
+  align-items: center;
   border-top: 1px solid var(--border);
   background: rgba(255,255,255,0.02);
-  height: auto;
+  height: 55px;
 }
 
 
@@ -514,6 +514,28 @@ button:active{ transform: translateY(1px); }
   flex-shrink: 0;       /* Prevents the ellipsis from affecting this element */
   white-space: nowrap;  /* Ensures the time stays on one line */
   font-family: monospace; /* Keeps numbers from jumping */
+}
+.current-stage-div{
+  display: flex;
+  align-items: center;
+}
+.current-stage-text{
+  font-size: 12px;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-right: 5px;
+  min-width: 68px;
+}
+.current-stage{
+  font-size: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: rgba(95, 74, 255, 0.9);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
 }
 
 /* Leak List */

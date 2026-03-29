@@ -95,8 +95,8 @@ function startWorldClock() {
   setInterval(updateTimes, 1000);
 }
 
-let countdownState = false
-let leakState = false
+let countdownState = true
+let leakState = true
 
 const today = new Date().toISOString().split('T')[0]; 
 const todaysSchedule = schedule[today];
@@ -183,6 +183,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const stageSlots = daySchedule[stageName];
   let currentArtist = "OFF AIR";
   let nextArtist = "TBD";
+  let stage = "UNKNOWN";
   let nextStart = null;
 
   for (let i = 0; i < stageSlots.length; i++) {
@@ -196,6 +197,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         nextArtist = stageSlots[i + 1].name;
         nextStart = stageSlots[i + 1].start; // Store "19:00"
       }
+      stage = slot.stage;
       break;
     } else if (currentTimeInt < startInt) {
       currentArtist = "STARTING SOON";
@@ -205,7 +207,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
-  return { current: currentArtist, next: nextArtist, nextStart };
+  return { current: currentArtist, next: nextArtist, nextStart, stage: stage };
 };
 const getCountdown = (startTimeStr) => {
   if (!startTimeStr) return "";
@@ -296,6 +298,10 @@ const getCountdown = (startTimeStr) => {
       const cameraInfo = document.createElement("div");
       cameraInfo.className = "camera-info";
 
+      const infoContainer = document.createElement("div");
+      infoContainer.className = "camera-info-container"
+      cameraInfo.appendChild(infoContainer);
+
       const schedInfo = getUltraScheduleInfo(schedule, camera.schedule);
 
       const currentlyPlayingDiv = document.createElement("div");
@@ -350,8 +356,21 @@ const getCountdown = (startTimeStr) => {
       
       // SCHEDULE LINK ADD NEXT AND CURRENT HERE
 
-      cameraInfo.appendChild(currentlyPlayingDiv);
-      cameraInfo.appendChild(upNextDiv);
+      infoContainer.appendChild(currentlyPlayingDiv);
+      infoContainer.appendChild(upNextDiv);
+      if (schedInfo.stage) {
+        const currentStageDiv = document.createElement("div");
+        currentStageDiv.className = "current-stage-div";
+        const CurrentStageSpan = document.createElement("span");
+        CurrentStageSpan.className = "current-stage-text";
+        CurrentStageSpan.innerHTML = "Current Stage: ";
+        currentStageDiv.appendChild(CurrentStageSpan);
+        const CurrentStage = document.createElement("span");
+        CurrentStage.className = "current-stage";
+        CurrentStage.textContent = schedInfo.stage;
+        currentStageDiv.appendChild(CurrentStage);
+        infoContainer.appendChild(currentStageDiv);
+      };
 
       cameraCard.appendChild(cameraHeader);
       cameraCard.appendChild(cameraPlayer);
