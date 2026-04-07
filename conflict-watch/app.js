@@ -30,7 +30,7 @@ function toYouTubeEmbedUrl(inputUrl) {
   if (url.hostname === "youtu.be") {
     const id = url.pathname.replace("/", "");
     if (!id) return null;
-    const embed = new URL(`https://www.youtube.com/embed/${id}`);
+    const embed = new URL(`https://www.youtube-nocookie.com/embed/${id}`);
     embed.searchParams.set("autoplay", "1");
     embed.searchParams.set("mute", "1");
     embed.searchParams.set("playsinline", "1");
@@ -41,7 +41,7 @@ function toYouTubeEmbedUrl(inputUrl) {
   if (url.hostname.includes("youtube.com")) {
     const id = url.searchParams.get("v");
     if (!id) return null;
-    const embed = new URL(`https://www.youtube.com/embed/${id}`);
+    const embed = new URL(`https://www.youtube-nocookie.com/embed/${id}`);
     embed.searchParams.set("autoplay", "1");
     embed.searchParams.set("mute", "1");
     embed.searchParams.set("playsinline", "1");
@@ -476,6 +476,38 @@ document.addEventListener("DOMContentLoaded", async () => {
       });
     };
 
+    // Layout buttons
+  const initLayoutButtons = () => {
+  const featuredBtn = document.getElementById("layout-featured");
+  const col2Btn = document.getElementById("layout-2col");
+  const col3Btn = document.getElementById("layout-3col");
+  const col4Btn = document.getElementById("layout-4col");
+
+  featuredBtn.addEventListener("click", () => {
+    cameraGrid.classList.add("featured");
+    document.documentElement.style.setProperty("--featured-mode", 1);
+    
+  });
+
+  col2Btn.addEventListener("click", () => {
+    cameraGrid.classList.remove("featured");
+    document.documentElement.style.setProperty("--cams-per-row", 2);
+  });
+
+  col3Btn.addEventListener("click", () => {
+    cameraGrid.classList.remove("featured");
+    document.documentElement.style.setProperty("--cams-per-row", 3);
+  });
+
+  col4Btn.addEventListener("click", () => {
+    cameraGrid.classList.remove("featured");
+    document.documentElement.style.setProperty("--cams-per-row", 4);
+  });
+};
+
+// Initialize
+initLayoutButtons();
+
     // ---------- SortableJS reorder + persist ----------
     const initSortable = () => {
       if (!window.Sortable) {
@@ -528,5 +560,4 @@ document.addEventListener("DOMContentLoaded", async () => {
     console.error("Application initialization failed:", err);
     alert("Failed to initialize the application. Check console for details.");
   }
-
 });

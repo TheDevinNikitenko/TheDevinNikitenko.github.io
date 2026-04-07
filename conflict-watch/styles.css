@@ -11,6 +11,9 @@
 
   --r: 14px;
   --gap: 14px;
+
+  --cams-per-row: 3;
+  --featured-mode: 0; /* 0 = normal grid, 1 = featured camera */
 }
 
 *{ box-sizing: border-box; }
@@ -245,11 +248,28 @@ button:active{ transform: translateY(1px); }
   font-size: 13px;
 }
 
+.layoutSettingsBtn{
+  background: rgba(255,255,255,0.08);
+  color: var(--text);
+  border-color: rgba(255,255,255,0.10);
+  padding: 5px 10px;
+  border-radius: 0px;
+}
+.layoutSettingsBtn:hover{
+  background: rgba(74,163,255,0.24);
+  border-color: rgba(74,163,255,0.55);
+}
+
 /* Camera grid */
 .camera-grid{
   display: grid;
   grid-template-columns: repeat(var(--cams-per-row, 3), 1fr);
   gap: 20px;
+}
+
+.camera-grid.featured .camera-card:first-child {
+  grid-column: span var(--cams-per-row);
+  grid-row: span var(--cams-per-row)2;
 }
 
 /* Camera card */
